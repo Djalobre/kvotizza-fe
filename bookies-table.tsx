@@ -8,7 +8,7 @@ import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { CountryFlag } from "./components/country-flag"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableCellExpanded,TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableCellExpanded,TableHeadMini, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -94,10 +94,10 @@ const getBestOdds = (match: DetailedMatch, category: string, type: string): numb
 }
 
 // 3-slovna srpska skraćenja (Sun..Sat; JS: 0=Sun)
-const SR_WEEKDAY3 = ["Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub"];
+const SR_WEEKDAY3 = ["Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub"]
 
 function getViewerTz(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Belgrade";
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Belgrade"
 }
 
 function ymdInTz(d: Date, timeZone: string): string {
@@ -107,18 +107,18 @@ function ymdInTz(d: Date, timeZone: string): string {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).formatToParts(d);
-  const y = parts.find(p => p.type === "year")!.value;
-  const m = parts.find(p => p.type === "month")!.value;
-  const day = parts.find(p => p.type === "day")!.value;
-  return `${y}-${m}-${day}`;
+  }).formatToParts(d)
+  const y = parts.find((p) => p.type === "year")!.value
+  const m = parts.find((p) => p.type === "month")!.value
+  const day = parts.find((p) => p.type === "day")!.value
+  return `${y}-${m}-${day}`
 }
 
 function diffDays(ymdA: string, ymdB: string): number {
   // Uporedimo dana po kalendaru — parsiramo kao UTC da izbegnemo offset
-  const a = new Date(ymdA).getTime();
-  const b = new Date(ymdB).getTime();
-  return Math.round((a - b) / 86400000);
+  const a = new Date(ymdA).getTime()
+  const b = new Date(ymdB).getTime()
+  return Math.round((a - b) / 86400000)
 }
 
 function formatTimeLocal(d: Date, timeZone: string, locale = "sr-Latn-RS"): string {
@@ -127,15 +127,15 @@ function formatTimeLocal(d: Date, timeZone: string, locale = "sr-Latn-RS"): stri
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  }).format(d);
+  }).format(d)
 }
 
 function weekday3(isoUtc: string, timeZone: string): string {
   const idx = new Date(
     // pretvori u lokalno samo za dobijanje dana u nedelji
-    new Date(isoUtc).toLocaleString("en-US", { timeZone })
-  ).getDay(); // 0..6
-  return SR_WEEKDAY3[idx];
+    new Date(isoUtc).toLocaleString("en-US", { timeZone }),
+  ).getDay() // 0..6
+  return SR_WEEKDAY3[idx]
 }
 
 /**
@@ -144,25 +144,22 @@ function weekday3(isoUtc: string, timeZone: string): string {
  * - options.locale: npr. "sr-Latn-RS" (default)
  * - options.tz: po želji forsiraj IANA TZ; ako izostaviš, koristi se viewer TZ
  */
-export function formatMatchLabel(
-  isoUtc: string,
-  options?: { locale?: string; tz?: string }
-): string {
-  const locale = options?.locale ?? "sr-Latn-RS";
-  const tz = options?.tz ?? getViewerTz();
+export function formatMatchLabel(isoUtc: string, options?: { locale?: string; tz?: string }): string {
+  const locale = options?.locale ?? "sr-Latn-RS"
+  const tz = options?.tz ?? getViewerTz()
 
-  const now = new Date();
-  const target = new Date(isoUtc);
+  const now = new Date()
+  const target = new Date(isoUtc)
 
-  const todayYmd = ymdInTz(now, tz);
-  const targetYmd = ymdInTz(target, tz);
-  const delta = diffDays(targetYmd, todayYmd); // 0=danas, 1=sutra, 2..6=ostali u 7 dana
+  const todayYmd = ymdInTz(now, tz)
+  const targetYmd = ymdInTz(target, tz)
+  const delta = diffDays(targetYmd, todayYmd) // 0=danas, 1=sutra, 2..6=ostali u 7 dana
 
-  const time = formatTimeLocal(target, tz, locale);
+  const time = formatTimeLocal(target, tz, locale)
 
-  if (delta === 0) return `Danas ${time}`;
-  if (delta === 1) return `Sutra ${time}`;
-  if (delta >= 2 && delta <= 6) return `${weekday3(isoUtc, tz)} ${time}`;
+  if (delta === 0) return `Danas ${time}`
+  if (delta === 1) return `Sutra ${time}`
+  if (delta >= 2 && delta <= 6) return `${weekday3(isoUtc, tz)} ${time}`
 
   // Van 7 dana: datum + vreme (dd.MM.yyyy HH:mm)
   const dateStr = new Intl.DateTimeFormat(locale, {
@@ -170,11 +167,9 @@ export function formatMatchLabel(
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-  }).format(target);
-  return `${dateStr} ${time}`;
+  }).format(target)
+  return `${dateStr} ${time}`
 }
-
-
 
 export default function Component({}: BookiesTableProps) {
   const [allMatches, setAllMatches] = useState<BasicMatch[]>([]) // Store all matches from API
@@ -196,7 +191,6 @@ export default function Component({}: BookiesTableProps) {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [itemsPerPage, setItemsPerPage] = useState<number>(15)
 
-
   // Get current sport configuration
   const currentSportConfig = sportsConfigService.getSportConfig(selectedSport)
   const quickMarkets = sportsConfigService.getQuickMarkets(selectedSport)
@@ -204,14 +198,14 @@ export default function Component({}: BookiesTableProps) {
 
   const availableDateSpans = sportsConfigService.getDateSpansList()
   const currentDateSpanConfig = sportsConfigService.getDateSpanConfig(selectedDateSpan)
-const [isMobileView, setIsMobileView] = useState(false)
+  const [isMobileView, setIsMobileView] = useState(false)
 
-useEffect(() => {
-  const update = () => setIsMobileView(window.innerWidth < 640)
-  update()
-  window.addEventListener("resize", update)
-  return () => window.removeEventListener("resize", update)
-}, [])
+  useEffect(() => {
+    const update = () => setIsMobileView(window.innerWidth < 640)
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [])
   // Fetch all matches data on component mount or sport change
   const fetchAllMatches = async () => {
     try {
@@ -224,9 +218,8 @@ useEffect(() => {
       setCurrentPage(1)
 
       const data = await apiService.getMatches(selectedSport, {
-                dateSpan: selectedDateSpan, // Always pass the dateSpan, don't check if it's "all"
-      }
-        )
+        dateSpan: selectedDateSpan, // Always pass the dateSpan, don't check if it's "all"
+      })
       // Handle different API response formats
       let matches: BasicMatch[] = []
       if (Array.isArray(data)) {
@@ -234,9 +227,11 @@ useEffect(() => {
         matches = data
       } else if (data && typeof data === "object") {
         // API returns object with matches array
-        matches = (data as { matches?: BasicMatch[]; data?: BasicMatch[]; results?: BasicMatch[] }).matches || 
-                   (data as { matches?: BasicMatch[]; data?: BasicMatch[]; results?: BasicMatch[] }).data || 
-                   (data as { matches?: BasicMatch[]; data?: BasicMatch[]; results?: BasicMatch[] }).results || []
+        matches =
+          (data as { matches?: BasicMatch[]; data?: BasicMatch[]; results?: BasicMatch[] }).matches ||
+          (data as { matches?: BasicMatch[]; data?: BasicMatch[]; results?: BasicMatch[] }).data ||
+          (data as { matches?: BasicMatch[]; data?: BasicMatch[]; results?: BasicMatch[] }).results ||
+          []
       }
 
       setAllMatches(matches)
@@ -359,7 +354,6 @@ useEffect(() => {
     setCurrentPage(1) // Reset to first page when filtering
   }
 
-
   const handleViewModeChange = (newMode: ViewMode) => {
     setViewMode(newMode)
     setCurrentPage(1) // Reset to first page when changing view mode
@@ -391,47 +385,48 @@ useEffect(() => {
     )
   }
 
-    // For league-based view
-    let lastRenderedLeague: string | null = null
+  // For league-based view
+  let lastRenderedLeague: string | null = null
 
-    // For time-based view
-    let lastRenderedDate: string | null = null
+  // For time-based view
+  const lastRenderedDate: string | null = null
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className={`transition-all duration-300 ${sidebarOpen ? "mr-96" : "mr-0"} px-[5px] sm:px-4 md:px-8`}>        
+    <div className="min-h-screen min-w-[360px] bg-background">
+      <div
+        className={`transition-all duration-300 ${sidebarOpen ? "mr-96" : "mr-0"} px-[5px] sm:px-4 md:px-8 relative`}
+      >
         <div className="w-full sm:max-w-7xl sm:mx-auto space-y-4 shrink-0">
           {/* Compact Header */}
-          <div className="sticky top-0 z-40 bg-background shadow-sm">
-
-                <div className="text-center space-y-2">
-                <div className="flex items-center justify-center gap-4 mb-2">
-                  <Image
+          <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+            <div className="text-center space-y-2 py-4">
+              <div className="flex items-center justify-center gap-4 mb-2">
+                <Image
                   src="/images/kvotizza-logo.png"
                   alt="Kvotizza Logo"
-                  width={200} // Increased width
-                  height={200} // Increased height
-                  className="h-20 w-auto" // Adjusted height class
-                  />
-                      <h1 className="hidden sm:block text-3xl font-bold tracking-tight text-kvotizza-headline-700">
-                      Uporedi kvote — izaberi najbolju ponudu</h1>
-
-                </div>
-                </div>
+                  width={200}
+                  height={200}
+                  className="h-20 w-auto"
+                />
+                <h1 className="hidden sm:block text-3xl font-bold tracking-tight text-kvotizza-headline-700">
+                  Uporedi kvote — izaberi najbolju ponudu
+                </h1>
               </div>
+            </div>
+          </div>
           {/* Compact Controls Bar */}
-          <div className="sticky top-0 z-30 bg-background shadow-sm">
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex flex-col lg:flex-row gap-3">
-              <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">View:</span>
-                  <div className="flex gap-1">
-                    <Button
-                      variant={viewMode === "league" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleViewModeChange("league")}
-                      className={`
+          <div className="sticky top-[120px] z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+            <Card className="border-0 shadow-sm rounded-none">
+              <CardContent className="p-3">
+                <div className="flex flex-col lg:flex-row gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">View:</span>
+                    <div className="flex gap-1">
+                      <Button
+                        variant={viewMode === "league" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleViewModeChange("league")}
+                        className={`
                         h-7 px-2 text-xs whitespace-nowrap transition-all duration-200 flex items-center gap-1
                         ${
                           viewMode === "league"
@@ -439,15 +434,15 @@ useEffect(() => {
                             : "bg-transparent text-kvotizza-purple-700 hover:bg-kvotizza-purple-50 border-kvotizza-purple-200"
                         }
                       `}
-                    >
-                      <List className="h-3 w-3" />
-                      League
-                    </Button>
-                    <Button
-                      variant={viewMode === "time" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleViewModeChange("time")}
-                      className={`
+                      >
+                        <List className="h-3 w-3" />
+                        League
+                      </Button>
+                      <Button
+                        variant={viewMode === "time" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleViewModeChange("time")}
+                        className={`
                         h-7 px-2 text-xs whitespace-nowrap transition-all duration-200 flex items-center gap-1
                         ${
                           viewMode === "time"
@@ -455,25 +450,25 @@ useEffect(() => {
                             : "bg-transparent text-kvotizza-purple-700 hover:bg-kvotizza-purple-50 border-kvotizza-purple-200"
                         }
                       `}
-                    >
-                      <Clock className="h-3 w-3" />
-                      Time
-                    </Button>
+                      >
+                        <Clock className="h-3 w-3" />
+                        Time
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <Separator orientation="vertical" className="hidden lg:block h-8" />
+                  <Separator orientation="vertical" className="hidden lg:block h-8" />
 
-                {/* Sport Selection - Compact Pills */}
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Sport:</span>
-                  <div className="flex gap-1 overflow-x-auto">
-                    {availableSports.map((sport) => (
-                      <Button
-                        key={sport.key}
-                        variant={selectedSport === sport.key ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedSport(sport.key)}
-                        className={`
+                  {/* Sport Selection - Compact Pills */}
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Sport:</span>
+                    <div className="flex gap-1 overflow-x-auto">
+                      {availableSports.map((sport) => (
+                        <Button
+                          key={sport.key}
+                          variant={selectedSport === sport.key ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedSport(sport.key)}
+                          className={`
                           h-7 px-2 text-xs whitespace-nowrap transition-all duration-200
                           ${
                             selectedSport === sport.key
@@ -481,30 +476,30 @@ useEffect(() => {
                               : "bg-transparent text-kvotizza-blue-700 hover:bg-kvotizza-blue-50 border-kvotizza-blue-200"
                           }
                         `}
-                      >
-                        {sport.displayName}
-                      </Button>
-                    ))}
+                        >
+                          {sport.displayName}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <Separator orientation="vertical" className="hidden lg:block h-8" />
+                  <Separator orientation="vertical" className="hidden lg:block h-8" />
 
-                {/* Date Selection - Compact Pills */}
-                <div className="flex items-center gap-2 min-w-0">
+                  {/* Date Selection - Compact Pills */}
                   <div className="flex items-center gap-2 min-w-0">
-                  <Calendar className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Date:</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Calendar className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Date:</span>
 
-                  {/* Desktop view — horizontal buttons */}
-                  <div className="hidden sm:flex gap-1 overflow-x-auto">
-                    {availableDateSpans.map((dateSpan) => (
-                      <Button
-                        key={dateSpan.key}
-                        variant={selectedDateSpan === dateSpan.key ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedDateSpan(dateSpan.key)}
-                        className={`
+                      {/* Desktop view — horizontal buttons */}
+                      <div className="hidden sm:flex gap-1 overflow-x-auto">
+                        {availableDateSpans.map((dateSpan) => (
+                          <Button
+                            key={dateSpan.key}
+                            variant={selectedDateSpan === dateSpan.key ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setSelectedDateSpan(dateSpan.key)}
+                            className={`
                           h-7 px-2 text-xs whitespace-nowrap transition-all duration-200
                           ${
                             selectedDateSpan === dateSpan.key
@@ -512,78 +507,76 @@ useEffect(() => {
                               : "bg-transparent text-kvotizza-green-700 hover:bg-kvotizza-green-50 border-kvotizza-green-200"
                           }
                         `}
-                        title={dateSpan.description}
-                      >
-                        {dateSpan.displayName}
-                      </Button>
-                    ))}
+                            title={dateSpan.description}
+                          >
+                            {dateSpan.displayName}
+                          </Button>
+                        ))}
+                      </div>
+
+                      {/* Mobile view — dropdown */}
+                      <div className="sm:hidden w-full">
+                        <Select value={selectedDateSpan} onValueChange={setSelectedDateSpan}>
+                          <SelectTrigger className="h-7 w-full text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableDateSpans.map((dateSpan) => (
+                              <SelectItem key={dateSpan.key} value={dateSpan.key} className="text-xs">
+                                {dateSpan.displayName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Mobile view — dropdown */}
-                  <div className="sm:hidden w-full">
-                    <Select value={selectedDateSpan} onValueChange={setSelectedDateSpan}>
-                      <SelectTrigger className="h-7 w-full text-xs">
+                  <Separator orientation="vertical" className="hidden lg:block h-8" />
+
+                  {/* Search and Filters - Compact */}
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <Search className="h-3 w-3 text-muted-foreground hidden sm:block" />
+                    <Input
+                      placeholder="Search matches..."
+                      value={searchTerm}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                      className="h-7 text-xs flex-1 min-w-0"
+                    />
+                    <Select value={leagueFilter} onValueChange={handleLeagueFilter}>
+                      <SelectTrigger className="h-7 w-24 text-xs">
+                        <Filter className="h-3 w-3 mr-1" />
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableDateSpans.map((dateSpan) => (
-                          <SelectItem key={dateSpan.key} value={dateSpan.key} className="text-xs">
-                            {dateSpan.displayName}
+                        <SelectItem value="all">All</SelectItem>
+                        {leagues.map((league: string) => (
+                          <SelectItem key={league} value={league} className="text-xs">
+                            {league}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+
+                    {/* Results count */}
+                    <Badge variant="outline" className="text-xs whitespace-nowrap">
+                      {filteredData.length} matches
+                    </Badge>
                   </div>
+                  <ThemeToggle />
                 </div>
-                                </div>
 
-                <Separator orientation="vertical" className="hidden lg:block h-8" />
-
-                {/* Search and Filters - Compact */}
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <Search className="h-3 w-3 text-muted-foreground hidden sm:block" />
-                  <Input
-                    placeholder="Search matches..."
-                    value={searchTerm}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                    className="h-7 text-xs flex-1 min-w-0"
-                  />
-                  <Select value={leagueFilter} onValueChange={handleLeagueFilter}>
-                    <SelectTrigger className="h-7 w-24 text-xs">
-                      <Filter className="h-3 w-3 mr-1" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      {leagues.map((league: string) => (
-                        <SelectItem key={league} value={league} className="text-xs">
-                          {league}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* Results count */}
-                  <Badge variant="outline" className="text-xs whitespace-nowrap">
-                    {filteredData.length} matches
-                  </Badge>
-                </div>
-                <ThemeToggle />
-
-              </div>
-
-              {/* Loading indicator */}
-              {loadingMatches && (
-                <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  <span>Loading matches...</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                {/* Loading indicator */}
+                {loadingMatches && (
+                  <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Loading matches...</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
-
 
           {/* Main Table */}
           {filteredData.length === 0 ? (
@@ -596,425 +589,426 @@ useEffect(() => {
                   : `No ${currentSportConfig?.displayName || selectedSport} matches available`}
               </p>
               {(searchTerm || leagueFilter !== "all") && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setSearchTerm("")
-                        setLeagueFilter("all")
-                        setSelectedDateSpan(sportsConfigService.getDefaultDateSpan())
-                        setCurrentPage(1)
-                      }}
-                      className="bg-transparent text-kvotizza-blue-700 hover:bg-kvotizza-blue-50"
-                    >
-                      Clear All Filters
-                    </Button>
-                  )}
-                </div>
-              ) : (
-              <Card>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchTerm("")
+                    setLeagueFilter("all")
+                    setSelectedDateSpan(sportsConfigService.getDefaultDateSpan())
+                    setCurrentPage(1)
+                  }}
+                  className="bg-transparent text-kvotizza-blue-700 hover:bg-kvotizza-blue-50"
+                >
+                  Clear All Filters
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Card>
               <CardContent className="p-0">
-              <div className="overflow-x-auto relative">
-                  <Table>
-                    <TableHeader className="sticky top-0 z-30 bg-background">
-                      <TableRow>
-                        <TableHead className="w-[50px] "></TableHead>
-                        {viewMode === "time" ? (
-                          <>
-                            <TableHead className="w-[120px] ">Match</TableHead>
-                          </>
-                        ) : (
-                          <TableHead className="font-semibold">Matchup</TableHead>
-                        )}
-                        {/* Dynamic Quick Market Columns */}
-                        {quickMarkets.map((market) => (
-                          <TableHead key={market.key} className="font-semibold text-center">
-                            {market.displayName}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>                    
-                    {paginatedData.map((match: BasicMatch) => {
-                        let showGroupHeader = false
-                        let groupHeaderText = ""
+                  <div className="overflow-x-auto max-h-[calc(100vh-300px)]">
+                    <Table>
+                      <TableHeader className="sticky top-0 z-20 bg-background border-b shadow-sm">
+                        <TableRow className="bg-background">
+                          <TableHeadMini className="w-[50px] bg-background"></TableHeadMini>
+                          {viewMode === "time" ? (
+                            <>
+                              <TableHeadMini className="w-[120px] bg-background font-semibold"></TableHeadMini>
+                            </>
+                          ) : (
+                            <TableHeadMini className="font-semibold bg-background"></TableHeadMini>
+                          )}
+                          {/* Dynamic Quick Market Columns */}
+                          {quickMarkets.map((market) => (
+                            <TableHeadMini key={market.key} className="font-semibold text-center bg-background text-xs sm:text-sm">
+                              {market.displayName}
+                            </TableHeadMini>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedData.map((match: BasicMatch) => {
+                          let showGroupHeader = false
+                          let groupHeaderText = ""
 
-                        if (viewMode === "league") {
-                          const isNewLeague = match.league !== lastRenderedLeague
-                          lastRenderedLeague = match.league
-                          showGroupHeader = isNewLeague
-                          groupHeaderText = match.league
-                        } 
+                          if (viewMode === "league") {
+                            const isNewLeague = match.league !== lastRenderedLeague
+                            lastRenderedLeague = match.league
+                            showGroupHeader = isNewLeague
+                            groupHeaderText = match.league
+                          }
 
-                        const colSpan = viewMode === "time" ? 2 + quickMarkets.length : 2 + quickMarkets.length
+                          const colSpan = viewMode === "time" ? 2 + quickMarkets.length : 2 + quickMarkets.length
 
-                        return (
-                          <React.Fragment key={match.id}>
-                            {showGroupHeader && (
-                              <TableRow className="bg-kvotizza-blue-50/50 dark:bg-kvotizza-blue-950/20">
-                                <TableCell colSpan={colSpan} className="font-bold text-lg py-3">
-                                  <div className="flex items-center gap-2">
-                                    <Trophy className="h-5 w-5 text-kvotizza-blue-600" />
-                                    {groupHeaderText}
-                                  </div>
+                          return (
+                            <React.Fragment key={match.id}>
+                              {showGroupHeader && (
+                                <TableRow className="sticky top-[39px] z-10 bg-kvotizza-blue-500 dark:bg-kvotizza-blue-900 border-b shadow-sm bg-background">
+                                  <TableCellExpanded colSpan={colSpan} className="font-bold text-lg bg-kvotizza-blue-500 dark:bg-kvotizza-blue-900 text-white" >
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <Trophy className="h-4 w-4 text-white" />
+                                      {groupHeaderText}
+                                    </div>
+                                  </TableCellExpanded>
+                                </TableRow>
+                              )}
+                              <TableRow
+                                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                                onClick={() => toggleRowExpansion(match.id)}
+                              >
+                                <TableCell>
+                                  {loadingDetails[match.id] ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : expandedRows.includes(match.id) ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
                                 </TableCell>
-                              </TableRow>
-                            )}
-                            <TableRow
-                              className="cursor-pointer hover:bg-muted/50 transition-colors"
-                              onClick={() => toggleRowExpansion(match.id)}
-                            >
-                              <TableCell>
-                                {loadingDetails[match.id] ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : expandedRows.includes(match.id) ? (
-                                  <ChevronDown className="h-4 w-4" />
+                                {viewMode === "time" ? (
+                                  <TableCell className="py-2">
+                                    <div className="flex items-center gap-3">
+                                      <CountryFlag countryCode={match.country} className="text-xs" />
+                                      <div className="flex flex-col">
+                                        <div className="text-xs font-bold text-kvotizza-green-600">
+                                          {formatMatchLabel(match.start_time)}
+                                        </div>
+                                        <div className="text-xs font-medium leading-tight">{match.matchup}</div>
+                                      </div>
+                                    </div>
+                                  </TableCell>
                                 ) : (
-                                  <ChevronRight className="h-4 w-4" />
-                                )}
-                              </TableCell>
-                              {viewMode === "time" ? (
-                                <TableCell className="py-2">
-                                  <div className="flex items-center gap-3">
-                                    <CountryFlag countryCode={match.country} className="text-lg" />
+                                  <TableCell className="py-2">
                                     <div className="flex flex-col">
-                                      <div className="text-sm font-bold text-kvotizza-green-600">
+                                      <div className="text-xs text-kvotizza-green-600 font-medium">
                                         {formatMatchLabel(match.start_time)}
                                       </div>
-                                      <div className="text-sm font-medium leading-tight">{match.matchup}</div>
+                                      <div className="font-medium">{match.matchup}</div>
                                     </div>
-                                  </div>
                                   </TableCell>
-                                    
-                              ):(
-                                <TableCell className="py-2">
-                                  <div className="flex flex-col">
-                                    <div className="text-xs text-kvotizza-green-600 font-medium">
-                                      {formatMatchLabel(match.start_time)}
-                                    </div>
-                                    <div className="font-medium">{match.matchup}</div>
-                                  </div>
-                                </TableCell>
-                              )}
-                              {/* Display best odds from quick markets */}
-                              {quickMarkets.map((market) => {
-                                const quickMarket = match.quickMarkets[market.key]
-                                return (
-                                  <TableCell key={`${match.id}-${market.key}`} className="text-center">
-                                    {quickMarket ? (
-                                      <div className="flex flex-col items-center gap-1">
-                                        <span className="text-xs text-muted-foreground">{quickMarket.bestBookie}</span>
-                                        <ClickableBetType
-                                          matchId={match.id}
-                                          matchup={match.matchup}
-                                          league={match.league}
-                                          category={market.category}
-                                          type={market.type}
-                                          displayOdds={quickMarket.bestOdds}
-                                          isBest={true}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <span className="text-muted-foreground">-</span>
-                                    )}
-                                  </TableCell>
-                                )
-                              })}
-                            </TableRow>
-                            {expandedRows.includes(match.id) && (
-                              <TableRow key={`${match.id}-expanded`}>
-                                <TableCell colSpan={colSpan} className="bg-muted/30">
-                                  <div className="p-4 space-y-4">
-                                    {loadingDetails[match.id] ? (
-                                      <div className="text-center py-8">
-                                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                                        <p className="text-muted-foreground">Loading detailed odds from API...</p>
-                                      </div>
-                                    ) : detailedMatches[match.id] ? (
-                                      <>
-                                        <div className="flex items-center justify-between">
-                                          <h4 className="text-lg font-semibold flex items-center gap-2 text-kvotizza-blue-600">
-                                            <TrendingUp className="h-5 w-5" />
-                                            Available Bet Types - Click to add to your selections
-                                          </h4>
-                                          <div className="flex gap-2">
-                                            <Button
-                                              variant="outline"
-                                              size="sm"
-                                              className="flex items-center gap-2 bg-transparent text-kvotizza-blue-700 hover:bg-kvotizza-blue-50"
-                                              onClick={(e) => {
-                                                e.stopPropagation()
-                                                window.open(
-                                                  `/match/${match.id}?sport=${selectedSport}&dateSpan=${selectedDateSpan}`,
-                                                  "_blank",
-                                                )
-                                              }}
-                                            >
-                                              <Eye className="h-4 w-4" />
-                                              View Full Details
-                                            </Button>
-                                            <Button
-                                              size="sm"
-                                              className="flex items-center gap-2 bg-kvotizza-blue-500 hover:bg-kvotizza-blue-600 text-white"
-                                              onClick={(e) => {
-                                                e.stopPropagation()
-                                                navigateToMatch(match.id)
-                                              }}
-                                            >
-                                              <ExternalLink className="h-4 w-4" />
-                                              Open Match Page
-                                            </Button>
-                                          </div>
+                                )}
+                                {/* Display best odds from quick markets */}
+                                {quickMarkets.map((market) => {
+                                  const quickMarket = match.quickMarkets[market.key]
+                                  return (
+                                    <TableCell key={`${match.id}-${market.key}`} className="text-center">
+                                      {quickMarket ? (
+                                        <div className="flex flex-col items-center gap-1">
+                                          <span className="text-xs text-muted-foreground">{quickMarket.bestBookie}</span>
+                                          <ClickableBetType
+                                            matchId={match.id}
+                                            matchup={match.matchup}
+                                            league={match.league}
+                                            category={market.category}
+                                            type={market.type}
+                                            displayOdds={quickMarket.bestOdds}
+                                            isBest={true}
+                                          />
                                         </div>
-
-                                        {/* Detailed Odds Table */}
-                                        <Card className="border-0 shadow-sm">
-                                          <CardContent className="p-0">
-                                            <div className="overflow-x-auto max-h-[500px]">
-                                              <Table>
-                                                <TableHeader>
-                                                  <TableRow className="bg-muted/50">
-                                                    <TableHead className="font-semibold sticky left-0 bg-muted/50">
-                                                      Category
-                                                    </TableHead>
-                                                    <TableHead className="font-semibold sticky left-[120px] bg-muted/50">
-                                                      Type
-                                                    </TableHead>
-                                                    {detailedMatches[match.id].bookies.map((bookie: Bookie) => (
-                                                      <TableHead
-                                                        key={bookie.name}
-                                                        className="font-semibold text-center min-w-[100px]"
-                                                      >
-                                                        {bookie.name}
-                                                      </TableHead>
-                                                    ))}
-                                                  </TableRow>
-                                                </TableHeader>
-                                                <TableBody>
-                                                  {Object.entries(getTypesByCategory(detailedMatches[match.id])).map(
-                                                    ([category, types]) =>
-                                                      types.map((betType, index) => {
-                                                        const bestOddsForType: number = getBestOdds(
-                                                          detailedMatches[match.id],
-                                                          betType.category,
-                                                          betType.type,
-                                                        )
-                                                        const categoryColors: Record<string, string> = {
-                                                          Goals: "bg-kvotizza-blue-50 dark:bg-kvotizza-blue-950/20",
-                                                          Result: "bg-kvotizza-green-50 dark:bg-kvotizza-green-950/20",
-                                                          Points:
-                                                            "bg-kvotizza-purple-50 dark:bg-kvotizza-purple-950/20",
-                                                          Sets: "bg-kvotizza-yellow-50 dark:bg-kvotizza-yellow-950/20",
-                                                          Handicap: "bg-kvotizza-red-50 dark:bg-kvotizza-red-950/20",
-                                                        }
-
-                                                        return (
-                                                          <TableRow key={`${category}-${betType.type}`}>
-                                                            {index === 0 && (
-                                                              <TableCell
-                                                                rowSpan={types.length}
-                                                                className={`font-medium border-r sticky left-0 ${categoryColors[category] || "bg-gray-50 dark:bg-gray-950/20"}`}
-                                                              >
-                                                                {category}
-                                                              </TableCell>
-                                                            )}
-                                                            <TableCell className="text-muted-foreground sticky left-[120px] bg-background border-r">
-                                                              <ClickableBetType
-                                                                matchId={match.id}
-                                                                matchup={match.matchup}
-                                                                league={match.league}
-                                                                category={betType.category}
-                                                                type={betType.type}
-                                                                className="font-medium bg-transparent hover:bg-muted p-1 rounded"
-                                                              >
-                                                                {betType.type}
-                                                              </ClickableBetType>
-                                                            </TableCell>
-                                                            {detailedMatches[match.id].bookies.map((bookie: Bookie) => {
-                                                              const odds: number | null = getOddsValue(
-                                                                bookie,
-                                                                betType.category,
-                                                                betType.type,
-                                                              )
-                                                              const isBest: boolean =
-                                                                odds === bestOddsForType && odds > 0
-                                                              return (
-                                                                <TableCell key={bookie.name} className="text-center">
-                                                                  {odds ? (
-                                                                    <div className="flex flex-col items-center gap-1">
-                                                                      <span className="text-xs text-muted-foreground">
-                                                                        {bookie.name}
-                                                                      </span>
-                                                                      <ClickableBetType
-                                                                        matchId={match.id}
-                                                                        matchup={match.matchup}
-                                                                        league={match.league}
-                                                                        category={betType.category}
-                                                                        type={betType.type}
-                                                                        displayOdds={odds}
-                                                                        isBest={isBest}
-                                                                      />
-                                                                    </div>
-                                                                  ) : (
-                                                                    <span className="text-muted-foreground">-</span>
-                                                                  )}
-                                                                </TableCell>
-                                                              )
-                                                            })}
-                                                          </TableRow>
-                                                        )
-                                                      }),
-                                                  )}
-                                                </TableBody>
-                                              </Table>
-                                            </div>
-                                          </CardContent>
-                                        </Card>
-                                      </>
-                                    ) : (
-                                      <div className="text-center py-8">
-                                        <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-4" />
-                                        <p className="text-muted-foreground">Failed to load detailed odds from API</p>
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          className="mt-2 bg-transparent"
-                                          onClick={() => fetchDetailedMatch(match.id)}
-                                        >
-                                          Retry
-                                        </Button>
-                                      </div>
-                                    )}
-                                  </div>
-                                </TableCell>
+                                      ) : (
+                                        <span className="text-muted-foreground">-</span>
+                                      )}
+                                    </TableCell>
+                                  )
+                                })}
                               </TableRow>
-                            )}
-                          </React.Fragment>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-            </CardContent>
-          </Card>
+                              {expandedRows.includes(match.id) && (
+                                <TableRow key={`${match.id}-expanded`}>
+                                  <TableCell colSpan={colSpan} className="bg-muted/30">
+                                    <div className="p-4 space-y-4">
+                                      {loadingDetails[match.id] ? (
+                                        <div className="text-center py-8">
+                                          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                                          <p className="text-muted-foreground">Loading detailed odds from API...</p>
+                                        </div>
+                                      ) : detailedMatches[match.id] ? (
+                                        <>
+                                          <div className="flex items-center justify-between">
+                                            <h4 className="text-lg font-semibold flex items-center gap-2 text-kvotizza-blue-600">
+                                              <TrendingUp className="h-5 w-5" />
+                                              Available Bet Types - Click to add to your selections
+                                            </h4>
+                                            <div className="flex gap-2">
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex items-center gap-2 bg-transparent text-kvotizza-blue-700 hover:bg-kvotizza-blue-50"
+                                                onClick={(e) => {
+                                                  e.stopPropagation()
+                                                  window.open(
+                                                    `/match/${match.id}?sport=${selectedSport}&dateSpan=${selectedDateSpan}`,
+                                                    "_blank",
+                                                  )
+                                                }}
+                                              >
+                                                <Eye className="h-4 w-4" />
+                                                View Full Details
+                                              </Button>
+                                              <Button
+                                                size="sm"
+                                                className="flex items-center gap-2 bg-kvotizza-blue-500 hover:bg-kvotizza-blue-600 text-white"
+                                                onClick={(e) => {
+                                                  e.stopPropagation()
+                                                  navigateToMatch(match.id)
+                                                }}
+                                              >
+                                                <ExternalLink className="h-4 w-4" />
+                                                Open Match Page
+                                              </Button>
+                                            </div>
+                                          </div>
+
+                                          {/* Detailed Odds Table */}
+                                          <Card className="border-0 shadow-sm">
+                                            <CardContent className="p-0">
+                                              <div className="overflow-x-auto max-h-[500px]">
+                                                <Table>
+                                                  <TableHeader>
+                                                    <TableRow className="bg-muted/50">
+                                                      <TableHead className="font-semibold sticky left-0 bg-muted/50 w-[120px] min-w-[120px] text-center">
+                                                        Category
+                                                      </TableHead>
+                                                      <TableHead className="font-semibold sticky left-[120px] bg-muted/50 w-[120px] min-w-[120px] text-center">
+                                                        Type
+                                                      </TableHead>
+                                                      {detailedMatches[match.id].bookies.map((bookie: Bookie) => (
+                                                        <TableHead
+                                                          key={bookie.name}
+                                                          className="font-semibold text-center min-w-[100px]"
+                                                        >
+                                                          {bookie.name}
+                                                        </TableHead>
+                                                      ))}
+                                                    </TableRow>
+                                                  </TableHeader>
+                                                  <TableBody>
+                                                    {Object.entries(getTypesByCategory(detailedMatches[match.id])).map(
+                                                      ([category, types]) =>
+                                                        types.map((betType, index) => {
+                                                          const bestOddsForType: number = getBestOdds(
+                                                            detailedMatches[match.id],
+                                                            betType.category,
+                                                            betType.type,
+                                                          )
+                                                          const categoryColors: Record<string, string> = {
+                                                            Goals: "bg-kvotizza-blue-50 dark:bg-kvotizza-blue-950/20",
+                                                            Result: "bg-kvotizza-green-50 dark:bg-kvotizza-green-950/20",
+                                                            Points:
+                                                              "bg-kvotizza-purple-50 dark:bg-kvotizza-purple-950/20",
+                                                            Sets: "bg-kvotizza-yellow-50 dark:bg-kvotizza-yellow-950/20",
+                                                            Handicap: "bg-kvotizza-red-50 dark:bg-kvotizza-red-950/20",
+                                                          }
+
+                                                          return (
+                                                            <TableRow key={`${category}-${betType.type}`}>
+                                                              {index === 0 && (
+                                                                <TableCell
+                                                                  rowSpan={types.length}
+                                                                  className={`font-medium border-r ${categoryColors[category] || "bg-gray-50 dark:bg-gray-950/20"}`}
+                                                                >
+                                                                  {category}
+                                                                </TableCell>
+                                                              )}
+                                                              <TableCell className="text-muted-foreground bg-background border-r">
+                                                                <div className="flex flex-col items-center">
+                                                                <ClickableBetType
+                                                                  matchId={match.id}
+                                                                  matchup={match.matchup}
+                                                                  league={match.league}
+                                                                  category={betType.category}
+                                                                  type={betType.type}
+                                                                  className="font-medium bg-transparent hover:bg-muted w-12 h-7 text-xs sm:w-20 sm:h-8 text-xs"
+                                                                >
+                                                                  {betType.type}
+                                                                </ClickableBetType>
+                                                                </div>
+                                                              </TableCell>
+                                                              {detailedMatches[match.id].bookies.map((bookie: Bookie) => {
+                                                                const odds: number | null = getOddsValue(
+                                                                  bookie,
+                                                                  betType.category,
+                                                                  betType.type,
+                                                                )
+                                                                const isBest: boolean =
+                                                                  odds === bestOddsForType && odds > 0
+                                                                return (
+                                                                  <TableCell key={bookie.name} className="text-center">
+                                                                    {odds ? (
+                                                                      <div className="flex flex-col items-center gap-1">
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                          {bookie.name}
+                                                                        </span>
+                                                                        <ClickableBetType
+                                                                          matchId={match.id}
+                                                                          matchup={match.matchup}
+                                                                          league={match.league}
+                                                                          category={betType.category}
+                                                                          type={betType.type}
+                                                                          displayOdds={odds}
+                                                                          isBest={isBest}
+                                                                        />
+                                                                      </div>
+                                                                    ) : (
+                                                                      <span className="text-muted-foreground">-</span>
+                                                                    )}
+                                                                  </TableCell>
+                                                                )
+                                                              })}
+                                                            </TableRow>
+                                                          )
+                                                        }),
+                                                    )}
+                                                  </TableBody>
+                                                </Table>
+                                              </div>
+                                            </CardContent>
+                                          </Card>
+                                        </>
+                                      ) : (
+                                        <div className="text-center py-8">
+                                          <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-4" />
+                                          <p className="text-muted-foreground">Failed to load detailed odds from API</p>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="mt-2 bg-transparent"
+                                            onClick={() => fetchDetailedMatch(match.id)}
+                                          >
+                                            Retry
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </React.Fragment>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
             )}
-          {/* Pagination Controls */}
-          {totalFilteredMatches > itemsPerPage && (
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                  {/* Items per page selector */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Show:</span>
-                    <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                      <SelectTrigger className="w-20">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="10">10</SelectItem>
-                        <SelectItem value="15">15</SelectItem>
-                        <SelectItem value="25">25</SelectItem>
-                        <SelectItem value="50">50</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <span className="text-sm text-muted-foreground">per page</span>
-                  </div>
-
-                  {/* Page info */}
-                  <div className="text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages} ({totalFilteredMatches}{" "}
-                    {searchTerm || leagueFilter !== "all" ? "filtered" : "total"} matches)
-                  </div>
-
-                  {/* Pagination buttons */}
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(1)}
-                      disabled={currentPage === 1}
-                      className="bg-transparent"
-                    >
-                      First
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="bg-transparent"
-                    >
-                      Previous
-                    </Button>
-
-                    {/* Page numbers */}
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        const pageNum = Math.max(1, currentPage - 2) + i
-                        if (pageNum > totalPages) return null
-
-                        return (
-                          <Button
-                            key={pageNum}
-                            variant={pageNum === currentPage ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => handlePageChange(pageNum)}
-                            className={
-                              pageNum === currentPage
-                                ? "bg-kvotizza-blue-500 hover:bg-kvotizza-blue-600 text-white"
-                                : "bg-transparent"
-                            }
-                          >
-                            {pageNum}
-                          </Button>
-                        )
-                      })}
+            {/* Pagination Controls */}
+            {totalFilteredMatches > itemsPerPage && (
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                    {/* Items per page selector */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Show:</span>
+                      <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                        <SelectTrigger className="w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="15">15</SelectItem>
+                          <SelectItem value="25">25</SelectItem>
+                          <SelectItem value="50">50</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <span className="text-sm text-muted-foreground">per page</span>
                     </div>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage >= totalPages}
-                      className="bg-transparent"
-                    >
-                      Next
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(totalPages)}
-                      disabled={currentPage >= totalPages}
-                      className="bg-transparent"
-                    >
-                      Last
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                    {/* Page info */}
+                    <div className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages} ({totalFilteredMatches}{" "}
+                      {searchTerm || leagueFilter !== "all" ? "filtered" : "total"} matches)
+                    </div>
 
-          {/* Results Summary */}
-          <div className="text-center text-sm text-muted-foreground">
-            Showing {Math.min(startIndex + 1, totalFilteredMatches)} to {Math.min(endIndex, totalFilteredMatches)} of{" "}
-            {totalFilteredMatches} {currentSportConfig?.displayName || selectedSport} matches
-            {(searchTerm || leagueFilter !== "all") && (
-              <span className="ml-2 text-kvotizza-blue-600">(filtered from {allMatches.length} total)</span>
+                    {/* Pagination buttons */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage === 1}
+                        className="bg-transparent"
+                      >
+                        First
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="bg-transparent"
+                      >
+                        Previous
+                      </Button>
+
+                      {/* Page numbers */}
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          const pageNum = Math.max(1, currentPage - 2) + i
+                          if (pageNum > totalPages) return null
+
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={pageNum === currentPage ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => handlePageChange(pageNum)}
+                              className={
+                                pageNum === currentPage
+                                  ? "bg-kvotizza-blue-500 hover:bg-kvotizza-blue-600 text-white"
+                                  : "bg-transparent"
+                              }
+                            >
+                              {pageNum}
+                            </Button>
+                          )
+                        })}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage >= totalPages}
+                        className="bg-transparent"
+                      >
+                        Next
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage >= totalPages}
+                        className="bg-transparent"
+                      >
+                        Last
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             )}
+
+            {/* Results Summary */}
+            <div className="text-center text-sm text-muted-foreground">
+              Showing {Math.min(startIndex + 1, totalFilteredMatches)} to {Math.min(endIndex, totalFilteredMatches)} of{" "}
+              {totalFilteredMatches} {currentSportConfig?.displayName || selectedSport} matches
+              {(searchTerm || leagueFilter !== "all") && (
+                <span className="ml-2 text-kvotizza-blue-600">(filtered from {allMatches.length} total)</span>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Bet Sidebar */}
+        <BetSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onAnalyzeBet={handleAnalyzeBet} />
+
+        {/* Bet Analysis Modal */}
+        <BetAnalysisModal
+          isOpen={analysisModalOpen}
+          onClose={() => setAnalysisModalOpen(false)}
+          selections={analysisSelections}
+          stake={10}
+        />
       </div>
-
-      {/* Bet Sidebar */}
-      <BetSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onAnalyzeBet={handleAnalyzeBet} />
-
-      {/* Bet Analysis Modal */}
-      <BetAnalysisModal
-        isOpen={analysisModalOpen}
-        onClose={() => setAnalysisModalOpen(false)}
-        selections={analysisSelections}
-        stake={10}
-      />
-    </div>
-  )
-}
+    )
+  }
