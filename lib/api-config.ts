@@ -1,70 +1,70 @@
-// API Configuration - Single unified endpoint
+// api-config.ts
+
+// detektuj okruženje
+const IS_SERVER = typeof window === "undefined";
+
+// bezbedno spajanje delova URL-a (bez duplih /)
+function ujoin(...parts: string[]) {
+  return parts
+    .map((p, i) => (i === 0 ? p.replace(/\/+$/, "") : p.replace(/^\/+|\/+$/g, "")))
+    .filter(Boolean)
+    .join("/");
+}
+
+// biramo origin: server -> INTERNAL_API_URL, browser -> NEXT_PUBLIC_API_URL
+const ORIGIN = IS_SERVER
+  ? process.env.INTERNAL_API_URL || "http://127.0.0.1:8000"
+  : process.env.NEXT_PUBLIC_API_URL || "https://api.kvotizza.online";
+
+// base API = <origin>/api
+const API_BASE = ujoin(ORIGIN, "api");
+
+// === Public config (isti shape kao pre) ===
 export const API_CONFIG = {
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "https://kvotizza.online/api",  
-    // Single endpoint that handles all sports
-    endpoints: {
-      // Basic matches endpoint - sport passed as query parameter
-      matches: `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://kvotizza.online/api"}/matches`,
-  
-      // Detailed match endpoint - sport passed as query parameter
-      matchDetails: (matchId: number) =>
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "https://kvotizza.online/api"}/matches/${matchId}`,
-    },
-  
-    // Request configuration
-    timeout: 10000,
-    retries: 3,
-  }
-  
-  // Helper function to build headers for your API requests
-  export const getApiHeaders = () => ({
-    "Content-Type": "application/json",
-    // Add any other headers your API requires
-    // 'X-API-Key': API_CONFIG.apiKey,
-    // 'Accept': 'application/json',
-  })
-  
-  // Helper function for API requests with error handling
-  export const apiRequest = async (url: string, options: RequestInit = {}) => {
-    console.log(`Making API request to: ${url}`)
-    const headers = {
+  baseUrl: API_BASE, // npr. http://127.0.0.1:8000/api ili https://api.kvotizza.online/api
+  endpoints: {
+    matches: ujoin(API_BASE, "matches"),
+    matchDetails: (matchId: number) => ujoin(API_BASE, "matches", String(matchId)),
+  },
+  timeout: 10_000,
+  retries: 3,
+};
+
+// standardni headeri
+export const getApiHeaders = () => ({
+  "Content-Type": "application/json",
+});
+
+// fetch sa retry i timeout-om
+export const apiRequest = async (url: string, options: RequestInit = {}) => {
+  // opciono: no-store da izbegnemo keš u SSR
+  const config: RequestInit = {
+    cache: "no-store",
+    ...options,
+    headers: {
       ...getApiHeaders(),
-      ...options.headers,
-    }
-  
-    const config: RequestInit = {
-      ...options,
-      headers,
-      // Add timeout using AbortController
-      signal: AbortSignal.timeout(API_CONFIG.timeout),
-    }
-  
-    let lastError: Error | null = null
-  
-    // Retry logic
-    for (let attempt = 1; attempt <= API_CONFIG.retries; attempt++) {
-      try {
-        const response = await fetch(url, config)
-  
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-  
-        return response
-      } catch (error) {
-        lastError = error as Error
-        console.warn(`API request attempt ${attempt} failed:`, error)
-  
-        // Don't retry on the last attempt
-        if (attempt === API_CONFIG.retries) {
-          break
-        }
-  
-        // Wait before retrying (exponential backoff)
-        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 1000))
+      ...(options.headers || {}),
+    },
+    // Node 18+/modern browsers: AbortSignal.timeout
+    signal: (options as any)?.signal ?? (AbortSignal as any).timeout?.(API_CONFIG.timeout),
+  };
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= API_CONFIG.retries; attempt++) {
+    try {
+      const res = await fetch(url, config);
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`HTTP ${res.status} ${res.statusText} :: ${text.slice(0, 200)}`);
       }
+      return res;
+    } catch (err) {
+      lastError = err as Error;
+      if (attempt === API_CONFIG.retries) break;
+      await new Promise((r) => setTimeout(r, 2 ** attempt * 1000));
     }
-  
-    throw lastError || new Error("API request failed after all retries")
   }
-  
+
+  throw lastError || new Error("API request failed after all retries");
+};
