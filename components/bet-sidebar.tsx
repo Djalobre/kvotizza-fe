@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import type { BetTypeSelection } from "../types/bookies"
+import React from "react"
 
 interface BetSidebarProps {
   isOpen: boolean
@@ -18,10 +19,37 @@ interface BetSidebarProps {
 
 export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarProps) {
   const [selections, setSelections] = useState<BetTypeSelection[]>([])
-  const [stake, setStake] = useState<number>(100)
   const [highlight, setHighlight] = useState(false)
+  const [stakeInput, setStakeInput] = useState<string>(""); // what user types
+  const stake = React.useMemo(() => {
+    // convert to number when you need it
+    const s = stakeInput.replace(",", ".").trim();
+    const n = Number(s);
+    return Number.isFinite(n) ? n : 0;
+  }, [stakeInput]);
 
-
+  function handleStakeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    // Allow only digits, one dot/comma, and empty string
+    const v = e.target.value;
+    const sanitized = v
+      .replace(/[^\d.,]/g, "")        // keep digits and separators
+      .replace(/[,]/g, ".")           // normalize comma to dot
+      .replace(/(\..*)\./g, "$1");    // only one dot
+    setStakeInput(sanitized);
+  }
+  
+  function handleStakeBlur() {
+    // Normalize on blur: clamp >= 0, remove leading zeros, or keep empty
+    if (stakeInput === "" || stakeInput === ".") {
+      setStakeInput(""); // allow empty
+      return;
+    }
+    const n = Math.max(0, Number(stakeInput));
+    // Format how you like: integer or fixed decimals
+    // For integer:
+    setStakeInput(String(n).replace(/^0+(?=\d)/, "")); // drop leading zeros
+    // For 2 decimals instead, use: setStakeInput(n.toFixed(2));
+  }
   const className = page === "main" ? "fixed z-[100] dark:bg-kvotizza-green-500 dark:text-white shadow-lg bg-kvotizza-green-500 hover:bg-kvotizza-green-600 backdrop-blur-none top-4 right-0 sm:top-6 sm:right-0 md:top-8 md:right-0" : "dark:bg-kvotizza-green-500 dark:text-white fixed z-[100] shadow-lg bg-white hover:bg-muted text-kvotizza-500 backdrop-blur-none top-4 right-0 sm:top-6 sm:right-0 md:top-8 md:right-0";
 
   useEffect(() => {
@@ -168,11 +196,20 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarP
                   <div>
                     <label className="text-sm font-medium">Ulog</label>
                     <Input
-                      type="number"
-                      value={stake}
-                      onChange={(e) => setStake(Number(e.target.value) || 0)}
-                      min="0"
+                      type="text"                 // use text to avoid browser forcing formats
+                      inputMode="decimal"         // mobile numeric keypad
+                      pattern="[0-9]*[.,]?[0-9]*" // soft validation
+                      placeholder="Unesite ulog"
+                      value={stakeInput}
+                      onChange={handleStakeChange}
+                      onBlur={handleStakeBlur}
                       className="mt-1 bg-white dark:bg-kvotizza-dark-bg-20 dark:border dark:border-white/30"
+                      // Optional: stop scroll wheel changing value on desktop mice
+                      onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+                      // Optional: block e/E/+/- which some browsers allow in number fields
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+                      }}
                     />
                   </div>
                 </div>
@@ -181,20 +218,26 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarP
 
                 {/* Action Buttons */}
                 <div className="space-y-2">
-                  <Button
-                    onClick={handleAnalyzeBet}
-                    variant="outline"
-                    className="w-full flex items-center gap-2 dark:border dark:border-white/30 dark:bg-transparent bg-white text-kvotizza-blue-700 dark:hover:bg-black/30 hover:bg-kvotizza-blue-50 dark:hover:text-dark-theme-kvotizza-blue-10 dark:text-white"
-                  >
-                    <BarChart3 className="h-4 w-4 dark:text-kvotizza-dark-theme-blue-10" />
-                    Analiza mečeva
-                  </Button>
+                <Button
+                  onClick={handleAnalyzeBet}
+                  disabled={!stake || stake <= 0} // stake is 0 or empty
+                  variant="outline"
+                  className={`
+                    w-full flex items-center gap-2
+                    dark:border dark:border-white/30 dark:bg-transparent bg-white
+                    text-kvotizza-blue-700 dark:hover:bg-black/30 hover:bg-kvotizza-blue-50
+                    dark:hover:text-dark-theme-kvotizza-blue-10 dark:text-white
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  `}
+                >
+                  <BarChart3 className="h-4 w-4 dark:text-kvotizza-dark-theme-blue-10" />
+                  Analiza mečeva
+                </Button>
 
-                  <p className="text-xs text-muted-foreground text-center dark:text-kvotizza-dark-theme-blue-10">
+                <p className="text-xs text-muted-foreground text-center dark:text-kvotizza-dark-theme-blue-10">
                   Analiza prikazuje kvote za izabrane tipove u svim kladionicama
-
-                  </p>
-                </div>
+                </p>
+              </div>
               </>
             )}
           </div>
