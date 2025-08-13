@@ -1013,7 +1013,7 @@ export default function Component({}: BookiesTableProps) {
                                   return (
                                     <TableCell key={`${match.id}-${market.key}`} className="text-center">
                                       {quickMarket ? (
-                                        <div className="flex flex-col items-left gap-1 px-4">
+                                        <div className="flex flex-col items-left gap-1 px-2 sm:px-4">
                                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                                                                     <Image
                                             src={`/images/${quickMarket.bestBookie.toLowerCase()}.png`}
