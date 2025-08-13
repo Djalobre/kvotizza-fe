@@ -245,7 +245,7 @@ export default function Component({}: BookiesTableProps) {
   useEffect(() => {
     const update = () => {
       setIsMobileView(window.innerWidth < 640)
-      setIsVeryNarrow(window.innerWidth <= 350)
+      setIsVeryNarrow(window.innerWidth <= 360)
     }
     update()
     window.addEventListener("resize", update)
@@ -481,8 +481,8 @@ export default function Component({}: BookiesTableProps) {
         <div className="w-full sm:max-w-7xl sm:mx-auto space-y-4 shrink-0">
           {/* Compact Header */}
           <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b dark:bg-kvotizza-dark-bg-10">
-            <div className="text-center space-y-2 py-4">
-              <div className="flex items-center justify-center gap-4 mb-2">
+            <div className="text-center space-y-2 py-4 h-15">
+              <div className="flex items-center justify-center gap-3 mb-2">
                 <Image
                   src="/images/kvotizza-logo.png"
                   alt="Kvotizza Logo"
@@ -498,7 +498,7 @@ export default function Component({}: BookiesTableProps) {
                   className="h-20 w-auto hidden dark:block"
                 />
                 <h1 className="hidden sm:block text-3xl font-bold tracking-tight text-kvotizza-headline-700 dark:text-white">
-                  Uporedi kvote — izaberi najbolju ponudu
+                  Uporedi kvote <span className="block text-kvotizza-green-500">Pronađi najbolju ponudu</span>
                 </h1>
               </div>
             </div>
@@ -630,9 +630,6 @@ export default function Component({}: BookiesTableProps) {
                       </SelectContent>
                     </Select>
 
-                    <Badge variant="outline" className="text-xs whitespace-nowrap">
-                      {filteredData.length} mečeva
-                    </Badge>
                     <ThemeToggle/>
                   </div>
                 </div>
@@ -717,12 +714,6 @@ export default function Component({}: BookiesTableProps) {
                           <ChevronDown className="h-3 fold:h-2 w-3 fold:w-2" />
                         )}
                       </Button>
-
-                      {/* Results Badge */}
-                      <Badge variant="outline" className="text-xs fold:text-[0.6rem] px-1 fold:px-0.5">
-                        {filteredData.length}
-                      </Badge>
-
                       <ThemeToggle />
                     </div>
                   </div>
@@ -1013,7 +1004,7 @@ export default function Component({}: BookiesTableProps) {
                                   return (
                                     <TableCell key={`${match.id}-${market.key}`} className="text-center">
                                       {quickMarket ? (
-                                        <div className="flex flex-col items-left gap-1 px-2 sm:px-4">
+                                        <div className="flex flex-col items-left gap-1 px-1 sm:px-4">
                                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                                                                     <Image
                                             src={`/images/${quickMarket.bestBookie.toLowerCase()}.png`}
