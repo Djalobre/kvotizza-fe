@@ -54,8 +54,27 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         // Custom colors for Kvotizza theme, based on logo
-
+        "kvotizza-dark-bg": {
+          10: "#1d2631",
+          20: "#2C3A4B"
+        },
+        "kvotizza-dark-theme-red": {
+          10: "#fc9088"
+        },
+        "kvotizza-dark-theme-purple": {
+          10:"#e8d8eb",
+          20:"#8b4cd9"
+        },
+        "kvotizza-dark-theme-green": {
+          10: "#b0f5dc"
+        },
+        "kvotizza-dark-theme-blue": {
+          10:"#c2caf2",
+          20:"#2c3e50"
+        },
         "kvotizza-green": {
+          10: "#17865d",
+          20: "#147955",
           50: "#d2eee3",
           100: "#c8e6c9",
           200: "#6fbf8e",
@@ -88,6 +107,7 @@ const config = {
           950: "#082D64",
         },
         "kvotizza-yellow": {
+          10: "#F2994A",
           50: "#fffde7",
           100: "#fff9c4",
           200: "#fff59d",

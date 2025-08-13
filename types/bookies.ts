@@ -1,6 +1,7 @@
 export interface Odd {
   type: string
   value: number
+  trend: string
 }
 
 export interface Category {
@@ -11,15 +12,6 @@ export interface Category {
 export interface Bookie {
   name: string
   categories: Category[]
-}
-
-export interface Tip {
-  type: string
-  odd: number
-}
-
-export interface OddsEntry {
-  [key: string]: number
 }
 
 // Basic match data for the main table
@@ -43,16 +35,10 @@ export interface DetailedMatch {
   id: number
   matchup: string
   league: string
-  odds: OddsEntry[]
-  tips: Tip[]
+  start_time: string
   bookies: Bookie[]
 }
 
-export type BasicMatchesData = BasicMatch[]
-
-// Legacy interface for backward compatibility
-export interface Match extends DetailedMatch {}
-export type BookiesData = Match[]
 
 // Updated interfaces for bet type selections (not specific bookie odds)
 export interface BetTypeSelection {
@@ -85,11 +71,48 @@ export interface BookieSummary {
   allAvailable: boolean
 }
 
+
 export interface BetSelection {
+  id: string
   matchId: number
   matchup: string
-  bookie: string
+  league: string
   category: string
   type: string
   odds: number
+  bookie: string
+  isBest?: boolean
+}
+
+
+export interface BonusThreshold {
+  minMatches: number
+  minOdds: number
+  bonusPercentage: number
+}
+
+export interface ConditionalBonusThreshold extends BonusThreshold {
+  excludeCategories?: string[]
+  includeCategories?: string[]
+  condition?: "exclude" | "include"
+  alternativePercentage?: number
+  conditionDescription?: string
+}
+
+export interface BookieBonusConfig {
+  bookie: string
+  displayName: string
+  thresholds: (BonusThreshold | ConditionalBonusThreshold)[]
+  description: string
+  hasConditionalBonuses?: boolean
+}
+
+export interface BonusCalculation {
+  qualifyingSelections: BetSelection[]
+  appliedThreshold: BonusThreshold | ConditionalBonusThreshold | null
+  bonusAmount: number
+  bonusPercentage: number
+  totalQualifyingOdds: number
+  conditionMet?: boolean
+  conditionDescription?: string
 }
