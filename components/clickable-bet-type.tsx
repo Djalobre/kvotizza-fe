@@ -59,15 +59,16 @@ export function ClickableBetType({
       onClick={handleBetTypeClick}
       className={`
             inline-block 
-            w-12 h-6 text-sm        /* Mobile size */
-            sm:w-20 sm:h-7 sm:text-base  /* Desktop size */
+            w-12 h-6 text-xs        /* Mobile size */
+            sm:w-20 sm:h-7 text-xs  /* Desktop size */
             rounded font-small 
             transition-all duration-200 
-            hover:scale-105 hover:shadow-md 
+            hover:scale-105 hover:shadow-md
             cursor-pointer
+            align-middle
         ${
           isBest
-            ? "bg-kvotizza-green-100 dark:bg-kvotizza-green-900/30 text-kvotizza-green-700 dark:text-kvotizza-green-300 font-bold hover:bg-kvotizza-green-200 dark:hover:bg-kvotizza-green-900/50"
+            ? "bg-transparent bg-kvotizza-green-100 text-kvotizza-green-700 dark:text-kvotizza-dark-theme-green-10 font-bold hover:text-white hover:bg-kvotizza-green-200 dark:hover:bg-kvotizza-green-600 dark:hover:text-white"
             : "bg-kvotizza-blue-50 dark:bg-kvotizza-blue-900/20 text-kvotizza-blue-700 dark:text-kvotizza-blue-300 hover:bg-kvotizza-blue-100 dark:hover:bg-kvotizza-blue-900/40"
         }
         

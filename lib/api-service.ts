@@ -52,7 +52,6 @@ export class ApiService {
       }
 
       const data = await response.json()
-      console.log(data)
       // Handle different response formats
       if (Array.isArray(data)) {
         return data
@@ -87,7 +86,7 @@ export class ApiService {
         }
         throw new Error(`Failed to fetch match details: ${response.status} ${response.statusText}`)
       }
-
+      
       return await response.json()
     } catch (error) {
       console.error(`Error in getMatchDetails for match ${matchId}:`, error)

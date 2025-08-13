@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server"
+import { NextResponse,NextRequest } from "next/server"
 import type { DetailedMatch } from "../../../../types/bookies"
 import { API_CONFIG, apiRequest } from "../../../../lib/api-config"
 import { sportsConfigService } from "../../../../lib/sports-config"
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const matchId = Number.parseInt(params.id)
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+    const url = new URL(request.url)
+    const matchId = Number.parseInt(url.pathname.split('/').pop() || '')
 
   // Validate the ID
   if (isNaN(matchId) || matchId <= 0) {
@@ -42,6 +43,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     const response = await apiRequest(apiUrl)
     const data = await response.json()
+    console.log(data, `Fetched match ${matchId} data from real API for ${sport} in ${dateSpan} span:`)
 
     // Get field mappings for this sport
     const fieldMappings = sportsConfigService.getFieldMappings(sport)
@@ -51,15 +53,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
       id: sportsConfigService.extractValue(data, fieldMappings.id || ["id"]) || matchId,
       matchup: sportsConfigService.extractValue(data, fieldMappings.matchup || ["matchup"]) || "Unknown Match",
       league: sportsConfigService.extractValue(data, fieldMappings.league || ["league"]) || "Unknown League",
+      start_time: sportsConfigService.extractValue(data, fieldMappings.start_time || ["start_time", "date"]) || new Date().toISOString(),
+      
 
-      // Transform odds data - adjust based on your API structure
-      odds: data.odds || data.oddsData || [],
 
-      // Transform tips/recommendations data
-      tips: (data.tips || data.recommendations || data.predictions || []).map((tip: any) => ({
-        type: tip.type || tip.betType || tip.name,
-        odd: tip.odd || tip.odds || tip.value || tip.price,
-      })),
 
       // Transform bookmakers/bookies data
       bookies: (data.bookies || data.bookmakers || data.sportsbooks || []).map((bookie: any) => ({
@@ -69,6 +66,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
           odds: (category.odds || category.selections || category.bets || []).map((odd: any) => ({
             type: odd.type || odd.selectionName || odd.name || odd.betName,
             value: Number(odd.value || odd.odds || odd.price || odd.decimal),
+            trend: odd.trend || odd.movement || odd.change || "none",
+
           })),
         })),
       })),
@@ -81,7 +80,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
       originalBookies: data.bookies?.length || 0,
       transformedBookies: transformedData.bookies.length,
       originalTips: data.tips?.length || 0,
-      transformedTips: transformedData.tips.length,
     })
 
     return NextResponse.json(transformedData)

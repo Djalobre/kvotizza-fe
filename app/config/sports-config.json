@@ -7,7 +7,7 @@
           {
             "key": "konacanIshod1",
             "category": "Konačan ishod",
-            "type": "Konačan ishod 1",
+            "type": "ki 1",
             "displayName": "Konačan ishod 1",
             "apiMappings": {
               "odds": ["quickMarkets.konacanIshod1.bestOdds"],
@@ -17,7 +17,7 @@
           {
             "key": "konacanIshodX",
             "category": "Konačan ishod",
-            "type": "Konačan ishod X",
+            "type": "ki X",
             "displayName": "Konačan ishod X",
             "apiMappings": {
               "odds": ["quickMarkets.konacanIshodX.bestOdds"],
@@ -26,8 +26,8 @@
           },
           {
             "key": "konacanIshod2",
-            "category": "Konačan ishod 2",
-            "type": "Konačan ishod 2",
+            "category": "Konačan ishod",
+            "type": "ki 2",
             "displayName": "Konačan ishod 2",
             "apiMappings": {
               "odds": ["quickMarkets.konacanIshod2.bestOdds"],
@@ -71,25 +71,19 @@
       },
       "naredna3dana": {
         "key": "naredna3dana",
-        "displayName": "Naredna 3 Dana",
+        "displayName": "3 Dana",
         "description": "Događaji u naredna 3 dana",
         "apiValue": "naredna3dana"
       },
       "narednih7dana": {
         "key": "narednih7dana",
-        "displayName": "Narednih 7 Dana",
+        "displayName": "7 Dana",
         "description": "Događaji u narednih 7 dana",
         "apiValue": "narednih7dana"
       },
-      "naredniMesec": {
-        "key": "naredniMesec",
-        "displayName": "Naredni mesec",
-        "description": "Događaji u narednih mesec dana",
-        "apiValue": "naredniMesec"
-      },
       "sve": {
         "key": "svi",
-        "displayName": "Svi događaji",
+        "displayName": "Svi",
         "description": "Svi predstojeći događaji",
         "apiValue": "svi"
       }

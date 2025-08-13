@@ -12,14 +12,17 @@ import type { BetTypeSelection } from "../types/bookies"
 interface BetSidebarProps {
   isOpen: boolean
   onToggle: () => void
-  onAnalyzeBet: (selections: BetTypeSelection[]) => void
+  onAnalyzeBet: (selections: BetTypeSelection[], stake: number) => void
+  page: string
 }
 
-export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) {
+export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarProps) {
   const [selections, setSelections] = useState<BetTypeSelection[]>([])
-  const [stake, setStake] = useState<number>(10)
+  const [stake, setStake] = useState<number>(100)
   const [highlight, setHighlight] = useState(false)
 
+
+  const className = page === "main" ? "fixed z-[100] dark:bg-kvotizza-green-500 dark:text-white shadow-lg bg-kvotizza-green-500 hover:bg-kvotizza-green-600 backdrop-blur-none top-4 right-0 sm:top-6 sm:right-0 md:top-8 md:right-0" : "dark:bg-kvotizza-green-500 dark:text-white fixed z-[100] shadow-lg bg-white hover:bg-muted text-kvotizza-500 backdrop-blur-none top-4 right-0 sm:top-6 sm:right-0 md:top-8 md:right-0";
 
   useEffect(() => {
     // Load selections from localStorage
@@ -68,7 +71,7 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
 
   const handleAnalyzeBet = () => {
     if (selections.length > 0) {
-      onAnalyzeBet(selections)
+      onAnalyzeBet(selections, stake)
     }
   }
 
@@ -80,7 +83,7 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
       {/* Sidebar */}
       <div
         className={`
-          fixed top-0 right-0 h-full bg-background border-l shadow-lg z-50 transition-transform duration-300 ease-in-out
+          fixed top-0 right-0 h-full bg-background border-l shadow-lg z-50 transition-transform duration-300 ease-in-out dark:bg-kvotizza-dark-bg-20 dark:border dark:border-white/30
           ${isOpen ? "translate-x-0" : "translate-x-full"}
           ${isOpen ? "w-full md:w-96" : "w-0"}
         `}
@@ -90,7 +93,7 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-2">
               <Calculator className="h-5 w-5 text-kvotizza-blue-500" />
-              <h2 className="text-lg font-semibold">Bet Builder</h2>
+              <h2 className="text-lg font-semibold">Tiket</h2>
               {selections.length > 0 && (
                 <Badge variant="secondary" className="ml-2">
                   {selections.length}
@@ -108,37 +111,37 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
               /* Empty State */
               <div className="text-center py-8">
                 <Calculator className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No bet types selected</h3>
-                <p className="text-sm text-muted-foreground">Click on any bet type to add it to your selections</p>
+                <h3 className="text-lg font-semibold mb-2">Nema izabranih mečeva</h3>
+                <p className="text-sm text-muted-foreground">Klikni na znak plus pored tipa da ga dodaš u izbor</p>
               </div>
             ) : (
               <>
                 {/* Selections List */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">Your Bet Type Selections</h3>
+                    <h3 className="font-semibold">Tvoj tiket</h3>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={clearAllSelections}
                       className="text-kvotizza-red-500 hover:text-kvotizza-red-700"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 dark:text-kvotizza-dark-theme-red-10" />
                     </Button>
                   </div>
 
                   {selections.map((selection, index) => (
-                    <Card key={index} className="p-3">
+                    <Card key={index} className="p-3 dark:bg-kvotizza-dark-bg-10 dark:border dark:border-white/30">
                       <div className="space-y-2">
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">{selection.matchup}</p>
                             <p className="text-xs text-muted-foreground truncate">{selection.league}</p>
                             <div className="flex items-center gap-1 mt-1">
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs dark:bg-kvotizza-dark-bg-20">
                                 {selection.category}
                               </Badge>
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant="secondary" className="text-xs dark:bg-kvotizza-dark-bg-20">
                                 {selection.type}
                               </Badge>
                             </div>
@@ -149,7 +152,7 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
                             onClick={() => removeSelection(index)}
                             className="text-kvotizza-red-500 hover:text-kvotizza-red-700 ml-2"
                           >
-                            <X className="h-3 w-3" />
+                            <X className="h-3 w-3 dark:text-kvotizza-dark-theme-red-10" />
                           </Button>
                         </div>
                       </div>
@@ -161,16 +164,15 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
 
                 {/* Stake Input */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Analysis Settings</h3>
+                  <h3 className="font-semibold">Podešavanje uloga</h3>
                   <div>
-                    <label className="text-sm font-medium">Stake for Analysis</label>
+                    <label className="text-sm font-medium">Ulog</label>
                     <Input
                       type="number"
                       value={stake}
                       onChange={(e) => setStake(Number(e.target.value) || 0)}
                       min="0"
-                      step="0.01"
-                      className="mt-1"
+                      className="mt-1 bg-white dark:bg-kvotizza-dark-bg-20 dark:border dark:border-white/30"
                     />
                   </div>
                 </div>
@@ -182,14 +184,15 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
                   <Button
                     onClick={handleAnalyzeBet}
                     variant="outline"
-                    className="w-full flex items-center gap-2 bg-transparent text-kvotizza-blue-700 hover:bg-kvotizza-blue-50"
+                    className="w-full flex items-center gap-2 dark:border dark:border-white/30 dark:bg-transparent bg-white text-kvotizza-blue-700 dark:hover:bg-black/30 hover:bg-kvotizza-blue-50 dark:hover:text-dark-theme-kvotizza-blue-10 dark:text-white"
                   >
-                    <BarChart3 className="h-4 w-4" />
-                    Analyze Bet Across All Bookies
+                    <BarChart3 className="h-4 w-4 dark:text-kvotizza-dark-theme-blue-10" />
+                    Analiza mečeva
                   </Button>
 
-                  <p className="text-xs text-muted-foreground text-center">
-                    Analysis will show odds for these bet types across all bookmakers
+                  <p className="text-xs text-muted-foreground text-center dark:text-kvotizza-dark-theme-blue-10">
+                  Analiza prikazuje kvote za izabrane tipove u svim kladionicama
+
                   </p>
                 </div>
               </>
@@ -200,24 +203,22 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet }: BetSidebarProps) 
 
       {/* Toggle Button when sidebar is closed */}
       {!isOpen && (
-        <Button
-          onClick={onToggle}
-          className="fixed top-4 right-4 z-40 shadow-lg bg-kvotizza-green-500 hover:bg-kvotizza-green-600 text-white"
-          size="sm"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Bet Types
-          {selections.length > 0 && (
-            
-            <Badge 
-            variant="secondary"
-            className={`ml-2 transition-colors duration-100 ${
-              highlight ? "bg-yellow-200 text-black" : ""
-            }`}>
-              {selections.length}
-            </Badge>
-          )}
-        </Button>
+  <Button
+    onClick={onToggle}
+    className={`${className}`}
+    size="sm"
+  >
+    <ChevronLeft className="h-4 w-4 mr-1" />
+    <span className="hidden sm:inline">Tiket</span> {/* hide label on very small screens */}
+    {selections.length > 0 && (
+      <Badge 
+        variant="secondary"
+        className={`ml-2 bg-white border-l border-black/30 dark:text-black transition-colors duration-100 px-1.5 py-0.5 text-xs ${highlight ? "bg-kvotizza-yellow-10 dark:text-white text-white" : ""}`}
+      >
+        {selections.length}
+      </Badge>
+    )}
+  </Button>
       )}
     </>
   )
