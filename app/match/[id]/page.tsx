@@ -161,7 +161,6 @@ export default function MatchPage() {
   const categories = getAllCategories(match)
   const filteredCategories =
     selectedCategory === "Kompletna ponuda" ? categories : categories.filter((cat) => cat === selectedCategory)
-
   return (
     <div className="min-h-screen bg-background">
       <div
