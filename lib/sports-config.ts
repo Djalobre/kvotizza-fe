@@ -11,9 +11,16 @@ export interface QuickMarket {
   }
 }
 
+export interface MarketGroup {
+  key: string
+  displayName: string
+  markets: QuickMarket[]
+}
+
 export interface SportConfig {
   name: string
   displayName: string
+  marketGroups?: MarketGroup[]
   quickMarkets: QuickMarket[]
   fieldMappings: {
     [key: string]: string[]
@@ -32,10 +39,12 @@ export interface SportsConfig {
     [key: string]: SportConfig
   }
   defaultSport: string
+  defaultMarketGroup?: string
   apiConfig: {
     endpoints: {
       matches: string
       matchDetails: string
+      categories: string
     }
     queryParams: {
       [key: string]: string
@@ -45,6 +54,8 @@ export interface SportsConfig {
     [key: string]: DateSpan
   }
   defaultDateSpan: string
+
+  defaultCategory: string
 }
 
 class SportsConfigService {
@@ -72,10 +83,22 @@ class SportsConfigService {
     return this.config.sports[sport] || null
   }
 
+
+  getDefaultMarketGroup(): string {
+    return this.config.defaultMarketGroup || "konacanIshod"
+  }
+
+    // Get quick markets for a sport
+    getFEQuickMarkets(sport: string, category: string): QuickMarket[] {
+      const sportConfig = this.getSportConfig(sport)
+      const data = sportConfig?.quickMarkets?.filter((market) => market.category === category) || []
+      return data|| []
+    }
+  
   // Get quick markets for a sport
   getQuickMarkets(sport: string): QuickMarket[] {
     const sportConfig = this.getSportConfig(sport)
-    return sportConfig?.quickMarkets || []
+    return sportConfig?.quickMarkets|| []
   }
 
   // Get field mappings for a sport
@@ -141,10 +164,8 @@ class SportsConfigService {
       league: this.extractValue(rawData, fieldMappings.league || ["league"]),
       start_time: this.extractValue(rawData, fieldMappings.start_time || ["start_time"]),
       country_name: this.extractValue(rawData, fieldMappings.country_name || ["country_name"]),
-
       quickMarkets: {},
     }
-
     // Transform quick markets
     quickMarkets.forEach((market) => {
       const odds = this.extractValue(rawData, market.apiMappings.odds)
@@ -185,6 +206,10 @@ class SportsConfigService {
   // Get default date span
   getDefaultDateSpan(): string {
     return this.config.defaultDateSpan || "naredna3dana"
+  }
+
+  getDefaultCategory(): string {
+    return this.config.defaultCategory || "Konačan ishod"
   }
 
   // Get available date spans list for UI
