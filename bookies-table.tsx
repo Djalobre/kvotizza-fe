@@ -2,6 +2,7 @@
 
 import React from "react"
 import Image from "next/image"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
@@ -11,6 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableCellExpanded,TableHeadMini, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   ChevronDown,
   ChevronRight,
@@ -91,18 +100,6 @@ const getTypesByCategory = (match: DetailedMatch): Record<string, { category: st
     categories[betType.category].push(betType)
   })
   return categories
-}
-
-// Helper function to find the best odds for a given bet type across all bookies for a match
-const getBestOdds = (match: DetailedMatch, category: string, type: string): number => {
-  let bestOdds = 0
-  match.bookies.forEach((bookie: Bookie) => {
-    const odds = getOddsValue(bookie, category, type)
-    if (odds !== null && odds > bestOdds) {
-      bestOdds = odds
-    }
-  })
-  return bestOdds
 }
 
 // 3-slovna srpska skraćenja (Sun..Sat; JS: 0=Sun)
@@ -208,6 +205,7 @@ window.dispatchEvent(new CustomEvent("betTypeSelectionsUpdated"))
 }
 export default function Component({}: BookiesTableProps) {
   const [allMatches, setAllMatches] = useState<BasicMatch[]>([]) // Store all matches from API
+  const [categories, setCategories] = useState<string[]>([])
   const [detailedMatches, setDetailedMatches] = useState<{ [key: number]: DetailedMatch }>({})
   const [loadingMatches, setLoadingMatches] = useState<boolean>(true)
   const [loadingDetails, setLoadingDetails] = useState<{ [key: number]: boolean }>({})
@@ -215,6 +213,8 @@ export default function Component({}: BookiesTableProps) {
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [leagueFilter, setLeagueFilter] = useState<string>("all")
   const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
+  const [selectedCategory, setSelectedCategory] = useState<string>(sportsConfigService.getDefaultCategory())
+
   const [selectedDateSpan, setSelectedDateSpan] = useState<string>(sportsConfigService.getDefaultDateSpan())
   const [analysisStake, setAnalysisStake] = useState<number>(10)
 
@@ -234,7 +234,7 @@ export default function Component({}: BookiesTableProps) {
 
   // Get current sport configuration
   const currentSportConfig = sportsConfigService.getSportConfig(selectedSport)
-  const quickMarkets = sportsConfigService.getQuickMarkets(selectedSport)
+  const quickMarkets = sportsConfigService.getFEQuickMarkets(selectedSport,selectedCategory)
   const availableSports = sportsConfigService.getSportsList()
 
   const availableDateSpans = sportsConfigService.getDateSpansList()
@@ -292,6 +292,16 @@ export default function Component({}: BookiesTableProps) {
   useEffect(() => {
     fetchAllMatches()
   }, [selectedSport, selectedDateSpan])
+
+
+  const fetchAllCategories = async() => {
+    const data = await apiService.getCategories(selectedSport)
+    setCategories(data)
+  }
+
+  useEffect(() =>{
+    fetchAllCategories()
+  }, [selectedSport])
 
   // Fetch detailed match data when row is expanded
   const fetchDetailedMatch = async (matchId: number) => {
@@ -920,20 +930,123 @@ export default function Component({}: BookiesTableProps) {
             <Card>
               <CardContent className="p-0">
                   <div className="overflow-x-auto max-h-[calc(100vh-300px)] rounded-lg">
-                    <Table>
+                    <Table className="table-fixed w-full">
                       <TableHeader className="sticky top-0 z-20 bg-white border-b shadow-sm dark:bg-kvotizza-dark-bg-20">
                         <TableRow className="bg-white dark:bg-kvotizza-dark-bg-20">
-                          <TableHeadMini className="w-[50px] bg-white dark:bg-kvotizza-dark-bg-20"></TableHeadMini>
+                          {isMobileView ? (
+                            <TableHeadMini className="w-[80px] bg-white dark:bg-kvotizza-dark-bg-20"> <div className="flex items-center justify-end"> {/* makes content right-aligned */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                              <Button variant="ghostNoRing" size="icon" className="-mr-1" onMouseDown={(e) => e.preventDefault()}>
+                                  <ChevronDown className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                        
+                              {/* align menu to the right edge of the trigger */}
+                              <DropdownMenuContent
+                                align="end"
+                                sideOffset={4}
+                                className="w-44 p-0 bg-popover text-popover-foreground border border-border/40 shadow-lg"
+                                onCloseAutoFocus={(e) => e.preventDefault()}
+
+                              >                                
+                              {categories.map((category) => (
+                                  <DropdownMenuItem
+                                    key={category}
+                                    onClick={() => setSelectedCategory(category)}
+                                    className={`rounded-none px-4 py-2  text-xs font-small transition-all border-b-2
+                                  ${selectedCategory === category
+                                    ? "bg-gray-50 dark:bg-kvotizza-dark-bg-20  dark:hover:bg-kvotizza-dark-bg-20 dark:text-white "
+                                    : "bg-gray-50  dark:bg-kvotizza-dark-bg-20 dark:hover:bg-kvotizza-dark-bg-20 hover:bg-muted border-transparent"}`}
+                              >
+                                    {category}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div></TableHeadMini>
+                          )
+                          :
+                        (<TableHeadMini className="w-[50px] bg-white dark:bg-kvotizza-dark-bg-20"></TableHeadMini>)
+                          }
                           {viewMode === "time" ? (
                             <>
-                              <TableHeadMini className="w-[120px] bg-white dark:bg-kvotizza-dark-bg-20 font-semibold hidden md:block"></TableHeadMini>
+                  <TableHeadMini className="font-semibold bg-white dark:bg-kvotizza-dark-bg-20 hidden md:block">
+                    <div className="flex items-center justify-end"> {/* makes content right-aligned */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghostNoRing" size="icon" className="-mr-1" onMouseDown={(e) => e.preventDefault()}> {/* snug to the right edge */}
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        {/* align menu to the right edge of the trigger */}
+                        <DropdownMenuContent
+                                align="end"
+                                sideOffset={4}
+                                className="w-44 p-0 bg-popover text-popover-foreground border border-border/40 shadow-lg"
+                                onCloseAutoFocus={(e) => e.preventDefault()}
+
+                              >   
+                              {categories.map((category) => (
+                            <DropdownMenuItem
+                              key={category}
+                              onClick={() => setSelectedCategory(category)}
+                              className={`rounded-none px-4 py-2 text-xs font-small transition-all border-b-2
+                                ${selectedCategory === category
+                                  ? "dark:bg-kvotizza-dark-bg-20 bg-gray-50 dark:hover:bg-kvotizza-dark-bg-20 text-black dark:text-white "
+                                  : "text-black/50 hover:bg-gray-50 dark:bg-kvotizza-dark-bg-20 bg-gray-50  dark:text-white/50  dark:hover:bg-kvotizza-dark-bg-20 "}`}
+                            >
+                              {category}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableHeadMini>
+
                             </>
                           ) : (
-                            <TableHeadMini className="font-semibold bg-white dark:bg-kvotizza-dark-bg-20 hidden md:block"></TableHeadMini>
-                          )}
+                      <TableHeadMini className="font-semibold bg-white dark:bg-kvotizza-dark-bg-20 hidden md:block">
+                        <div className="flex items-center justify-end"> {/* makes content right-aligned */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghostNoRing" size="icon" className="-mr-1" onMouseDown={(e) => e.preventDefault()}
+                              > {/* snug to the right edge */}
+                                <ChevronDown className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+
+                              {/* align menu to the right edge of the trigger */}
+                              <DropdownMenuContent
+                                align="end"
+                                sideOffset={4}
+                                className="w-44 p-0 bg-popover text-popover-foreground border border-border/40 shadow-lg"
+                                onCloseAutoFocus={(e) => e.preventDefault()}
+
+                              >   
+                              {categories.map((category) => (
+                                  <DropdownMenuItem
+                                    key={category}
+                                    onClick={() => setSelectedCategory(category)}
+                                    className={`rounded-none px-4 py-2 text-xs font-small transition-all border-b-2
+                                  ${selectedCategory === category
+                                    ? "dark:bg-kvotizza-dark-bg-20 bg-gray-50 dark:hover:bg-kvotizza-dark-bg-20 text-white dark:text-white "
+                                    : "text-white/50 hover:bg-muted border-transparent dark:bg-kvotizza-dark-bg-20 bg-gray-50  dark:hover:bg-kvotizza-dark-bg-20 "}`}
+                              >
+                                    {category}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableHeadMini>
+
+                          )
+                          }
                           {/* Dynamic Quick Market Columns */}
                           {quickMarkets.map((market) => (
-                            <TableHeadMini key={market.key} className="font-semibold text-left bg-white dark:bg-kvotizza-dark-bg-20 text-xs sm:text-sm dark:text-white">
+                            <TableHeadMini key={market.key} className="font-semibold text-center bg-white dark:bg-kvotizza-dark-bg-20 text-xs sm:text-sm dark:text-white">
                               {market.displayName}
                             </TableHeadMini>
                           ))}
@@ -951,7 +1064,8 @@ export default function Component({}: BookiesTableProps) {
                             groupHeaderText = match.league
                           }
 
-                          const colSpan = viewMode === "time" ? 2 + quickMarkets.length : 2 + quickMarkets.length
+                          const leadingCols = isMobileView ? 1 : 2; // time/league cell + (optional) expand caret
+                          const colSpan = leadingCols + quickMarkets.length;
 
                           return (
                             <React.Fragment key={match.id}>
@@ -1013,7 +1127,7 @@ export default function Component({}: BookiesTableProps) {
                                   return (
                                     <TableCell key={`${match.id}-${market.key}`} className="text-center">
                                       {quickMarket ? (
-                                        <div className="flex flex-col items-left gap-1 px-1 sm:px-4">
+                                        <div className="flex flex-col items-left gap-1 px-1 sm:px-4 items-center">
                                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                                                                     <Image
                                             src={`/images/${quickMarket.bestBookie.toLowerCase()}.png`}
