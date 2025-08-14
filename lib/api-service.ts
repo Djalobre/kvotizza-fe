@@ -14,6 +14,43 @@ export class ApiService {
     return ApiService.instance
   }
 
+
+
+  async getCategories(
+    sport?: string,
+  ): Promise<string[]> {
+    try {
+      const params = new URLSearchParams()
+
+      // Always add sport parameter
+      if (sport) {
+        params.append("sport", sport)
+      }
+      const response = await fetch(`/api/categories?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch categories: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      // Handle different response formats
+      if (Array.isArray(data)) {
+        return data
+      } else if (data && typeof data === "object") {
+        return data.matches || data.data || data.results || []
+      }
+
+      return []
+    } catch (error) {
+      console.error("Error in getCategories:", error)
+      throw error
+    }
+  }
+
   // Fetch basic matches data with sport parameter (simplified for client-side filtering)
   async getMatches(
     sport?: string,
@@ -46,7 +83,6 @@ export class ApiService {
           "Content-Type": "application/json",
         },
       })
-
       if (!response.ok) {
         throw new Error(`Failed to fetch matches: ${response.status} ${response.statusText}`)
       }
