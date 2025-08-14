@@ -256,7 +256,7 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarP
     {selections.length > 0 && (
       <Badge 
         variant="secondary"
-        className={`ml-2 bg-white border-l border-black/30 dark:text-black transition-colors duration-100 px-1.5 py-0.5 text-xs ${highlight ? "bg-kvotizza-yellow-10 dark:text-white text-white" : ""}`}
+        className={`ml-2 bg-white border-l border-black/30 dark:text-black transition-colors duration-100 px-1.5 py-0.5 text-xs ${highlight ? "bg-yellow-400 dark:text-black/70 text-black/70" : ""}`}
       >
         {selections.length}
       </Badge>
