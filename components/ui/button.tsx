@@ -17,7 +17,14 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghostNoRing:
+        "hover:bg-accent hover:text-accent-foreground " +
+        // kill all rings/borders (including Radix open state)
+        "focus:outline-none focus:ring-0 focus-visible:ring-0 ring-0 ring-offset-0 " +
+        "data-[state=open]:ring-0 data-[state=open]:ring-offset-0",
+    
         link: "text-primary underline-offset-4 hover:underline",
+        
       },
       size: {
         default: "h-10 px-4 py-2",
