@@ -1,93 +1,122 @@
 {
-    "sports": {
-      "fudbal": {
-        "name": "Fudbal",
-        "displayName": "Fudbal",
-        "quickMarkets": [
-          {
-            "key": "konacanIshod1",
-            "category": "Konačan ishod",
-            "type": "ki 1",
-            "displayName": "Konačan ishod 1",
-            "apiMappings": {
-              "odds": ["quickMarkets.konacanIshod1.bestOdds"],
-              "bookie": ["quickMarkets.konacanIshod1.bestBookie"]
-            }
-          },
-          {
-            "key": "konacanIshodX",
-            "category": "Konačan ishod",
-            "type": "ki X",
-            "displayName": "Konačan ishod X",
-            "apiMappings": {
-              "odds": ["quickMarkets.konacanIshodX.bestOdds"],
-              "bookie": ["quickMarkets.konacanIshodX.bestBookie"]
-            }
-          },
-          {
-            "key": "konacanIshod2",
-            "category": "Konačan ishod",
-            "type": "ki 2",
-            "displayName": "Konačan ishod 2",
-            "apiMappings": {
-              "odds": ["quickMarkets.konacanIshod2.bestOdds"],
-              "bookie": ["quickMarkets.konacanIshod2.bestBookie"]
-            }
+  "sports": {
+    "fudbal": {
+      "name": "Fudbal",
+      "displayName": "Fudbal",
+      "quickMarkets": [
+        {
+          "key": "konacanIshod1",
+          "category": "Konačan ishod",
+          "type": "ki 1",
+          "displayName": "Konačan ishod 1",
+          "apiMappings": {
+            "odds": ["quickMarkets.konacanIshod1.bestOdds"],
+            "bookie": ["quickMarkets.konacanIshod1.bestBookie"]
           }
-        ],
-        "fieldMappings": {
-          "id": ["id", "matchId"],
-          "matchup": ["matchup", "homeTeam|vs|awayTeam", "teams"],
-          "league": ["league", "competition", "tournament"],
-          "start_time" : ["start_time", "startTime"],
-          "homeTeam": ["homeTeam", "home"],
-          "awayTeam": ["awayTeam", "away"]
+        },
+        {
+          "key": "konacanIshodX",
+          "category": "Konačan ishod",
+          "type": "ki X",
+          "displayName": "Konačan ishod X",
+          "apiMappings": {
+            "odds": ["quickMarkets.konacanIshodX.bestOdds"],
+            "bookie": ["quickMarkets.konacanIshodX.bestBookie"]
+          }
+        },
+        {
+          "key": "konacanIshod2",
+          "category": "Konačan ishod",
+          "type": "ki 2",
+          "displayName": "Konačan ishod 2",
+          "apiMappings": {
+            "odds": ["quickMarkets.konacanIshod2.bestOdds"],
+            "bookie": ["quickMarkets.konacanIshod2.bestBookie"]
+          }
+        },
+        {
+          "key": "ukupnoGolova02",
+          "category": "Ukupno golova",
+          "type": "UG 0-2",
+          "displayName": "UG 0-2",
+          "apiMappings": {
+            "odds": ["quickMarkets.ukupnoGolova02.bestOdds"],
+            "bookie": ["quickMarkets.ukupnoGolova02.bestBookie"]
+          }
+        },
+        {
+          "key": "ukupnoGolova2Plus",
+          "category": "Ukupno golova",
+          "type": "UG 2+",
+          "displayName": "UG 2+",
+          "apiMappings": {
+            "odds": ["quickMarkets.ukupnoGolova2Plus.bestOdds"],
+            "bookie": ["quickMarkets.ukupnoGolova2Plus.bestBookie"]
+          }
+        },
+        {
+          "key": "ukupnoGolova3Plus",
+          "category": "Ukupno golova",
+          "type": "UG 3+",
+          "displayName": "UG 3+",
+          "apiMappings": {
+            "odds": ["quickMarkets.ukupnoGolova3Plus.bestOdds"],
+            "bookie": ["quickMarkets.ukupnoGolova3Plus.bestBookie"]
+          }
         }
-      }
-    },
-    "defaultSport": "fudbal",
-    "apiConfig": {
-      "endpoints": {
-        "matches": "/matches",
-        "matchDetails": "/matches/{id}"
-      },
-      "queryParams": {
-        "sport": "sport",
-        "league": "league",
-        "search": "search",
-        "limit": "limit",
-        "offset": "offset",
-        "dateSpan": "dateSpan"
-
+      ],
+      "fieldMappings": {
+        "id": ["id", "matchId"],
+        "matchup": ["matchup", "homeTeam|vs|awayTeam", "teams"],
+        "league": ["league", "competition", "tournament"],
+        "start_time": ["start_time", "startTime"],
+        "homeTeam": ["homeTeam", "home"],
+        "awayTeam": ["awayTeam", "away"]
       }
     }
-    ,
-    "dateSpans": {
-      "danas": {
-        "key": "danas",
-        "displayName": "Danas",
-        "description": "Današnji događaji",
-        "apiValue": "danas"
-      },
-      "naredna3dana": {
-        "key": "naredna3dana",
-        "displayName": "3 Dana",
-        "description": "Događaji u naredna 3 dana",
-        "apiValue": "naredna3dana"
-      },
-      "narednih7dana": {
-        "key": "narednih7dana",
-        "displayName": "7 Dana",
-        "description": "Događaji u narednih 7 dana",
-        "apiValue": "narednih7dana"
-      },
-      "sve": {
-        "key": "svi",
-        "displayName": "Svi",
-        "description": "Svi predstojeći događaji",
-        "apiValue": "svi"
-      }
+  },
+  "defaultSport": "fudbal",
+  "apiConfig": {
+    "endpoints": {
+      "matches": "/matches",
+      "matchDetails": "/matches/{id}",
+      "categories": "/categories"
     },
-    "defaultDateSpan": "naredna3dana"
-  }
-  
+    "queryParams": {
+      "sport": "sport",
+      "league": "league",
+      "search": "search",
+      "limit": "limit",
+      "offset": "offset",
+      "dateSpan": "dateSpan"
+    }
+  },
+  "dateSpans": {
+    "danas": {
+      "key": "danas",
+      "displayName": "Danas",
+      "description": "Današnji događaji",
+      "apiValue": "danas"
+    },
+    "naredna3dana": {
+      "key": "naredna3dana",
+      "displayName": "3 Dana",
+      "description": "Događaji u naredna 3 dana",
+      "apiValue": "naredna3dana"
+    },
+    "narednih7dana": {
+      "key": "narednih7dana",
+      "displayName": "7 Dana",
+      "description": "Događaji u narednih 7 dana",
+      "apiValue": "narednih7dana"
+    },
+    "sve": {
+      "key": "svi",
+      "displayName": "Svi",
+      "description": "Svi predstojeći događaji",
+      "apiValue": "svi"
+    }
+  },
+  "defaultDateSpan": "naredna3dana",
+  "defaultCategory": "Konačan ishod"
+}
