@@ -20,7 +20,7 @@ export interface BasicMatch {
   matchup: string
   league: string
   start_time: string
-  country: string
+  country_name: string
   // Configurable markets with best odds for quick display
   quickMarkets: {
     [key: string]: {
