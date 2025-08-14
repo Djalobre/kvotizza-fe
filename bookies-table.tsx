@@ -222,7 +222,7 @@ export default function Component({}: BookiesTableProps) {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
   const [analysisModalOpen, setAnalysisModalOpen] = useState<boolean>(false)
   const [analysisSelections, setAnalysisSelections] = useState<BetTypeSelection[]>([])
-  const [viewMode, setViewMode] = useState<ViewMode>("league")
+  const [viewMode, setViewMode] = useState<ViewMode>("time")
 
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [itemsPerPage, setItemsPerPage] = useState<number>(15)
@@ -517,6 +517,19 @@ export default function Component({}: BookiesTableProps) {
                       {/* <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">View:</span> */}
                       <div className="pl-4 flex gap-1">
                         <Button
+                          variant={viewMode === "time" ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleViewModeChange("time")}
+                          className={`
+                          h-7 px-2 text-xs whitespace-nowrap transition-all duration-200 flex items-center gap-1
+                          ${
+                            viewMode === "time"
+                              ? "dark:bg-kvotizza-dark-theme-purple-20 bg-kvotizza-purple-500 hover:bg-kvotizza-purple-600 text-white"
+                              : "bg-transparent dark:text-kvotizza-dark-theme-purple-10  text-kvotizza-purple-700 hover:bg-kvotizza-purple-50 dark:hover:bg-kvotizza-purple-700 dark:border-kvotizza-dark-theme-purple-10 border-kvotizza-purple-200"
+                          }
+                        `}
+                        >
+                        <Button
                           variant={viewMode === "league" ? "default" : "outline"}
                           size="sm"
                           onClick={() => handleViewModeChange("league")}
@@ -532,19 +545,7 @@ export default function Component({}: BookiesTableProps) {
                           <List className="h-3 w-3" />
                           Takmičenja  
                         </Button>
-                        <Button
-                          variant={viewMode === "time" ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleViewModeChange("time")}
-                          className={`
-                          h-7 px-2 text-xs whitespace-nowrap transition-all duration-200 flex items-center gap-1
-                          ${
-                            viewMode === "time"
-                              ? "dark:bg-kvotizza-dark-theme-purple-20 bg-kvotizza-purple-500 hover:bg-kvotizza-purple-600 text-white"
-                              : "bg-transparent dark:text-kvotizza-dark-theme-purple-10  text-kvotizza-purple-700 hover:bg-kvotizza-purple-50 dark:hover:bg-kvotizza-purple-700 dark:border-kvotizza-dark-theme-purple-10 border-kvotizza-purple-200"
-                          }
-                        `}
-                        >
+                        
                           <Clock className="h-3 w-3" />
                           Vreme
                         </Button>
@@ -640,6 +641,19 @@ export default function Component({}: BookiesTableProps) {
                   <div className="flex items-center justify-between gap-2 fold:gap-1">
                     {/* View Mode Toggle */}
                     <div className="flex gap-1">
+                                            <Button
+                        variant={viewMode === "time" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleViewModeChange("time")}
+                        className={`
+                        h-6 fold:h-5 px-2 fold:px-1 text-xs fold:text-[0.6rem] transition-all duration-200 flex items-center gap-1 active:dark:bg-kvotizza-purple-600
+                        ${
+                          viewMode === "time"
+                            ? " dark:bg-dark-theme-purple-20 bg-kvotizza-purple-500 hover:bg-kvotizza-purple-600 text-white"
+                            : "bg-transparent dark:text-kvotizza-dark-theme-purple-10 text-kvotizza-purple-700 hover:bg-kvotizza-purple-50 dark:border-kvotizza-dark-theme-purple-10 border-kvotizza-purple-200"
+                        }
+                      `}
+                      >
                       <Button
                         variant={viewMode === "league" ? "default" : "outline"}
                         size="sm"
@@ -656,19 +670,7 @@ export default function Component({}: BookiesTableProps) {
                         <List className="h-3 fold:h-2 w-3 fold:w-2" />
                         {!isVeryNarrow && "Takmičenje"}
                       </Button>
-                      <Button
-                        variant={viewMode === "time" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleViewModeChange("time")}
-                        className={`
-                        h-6 fold:h-5 px-2 fold:px-1 text-xs fold:text-[0.6rem] transition-all duration-200 flex items-center gap-1 active:dark:bg-kvotizza-purple-600
-                        ${
-                          viewMode === "time"
-                            ? " dark:bg-dark-theme-purple-20 bg-kvotizza-purple-500 hover:bg-kvotizza-purple-600 text-white"
-                            : "bg-transparent dark:text-kvotizza-dark-theme-purple-10 text-kvotizza-purple-700 hover:bg-kvotizza-purple-50 dark:border-kvotizza-dark-theme-purple-10 border-kvotizza-purple-200"
-                        }
-                      `}
-                      >
+
                         <Clock className="h-3 fold:h-2 w-3 fold:w-2" />
                         {!isVeryNarrow && "Vreme"}
                       </Button>
@@ -979,7 +981,13 @@ export default function Component({}: BookiesTableProps) {
                                 {viewMode === "time" ? (
                                   <TableCell className="py-2 ">
                                     <div className="flex items-center gap-3">
-                                      <CountryFlag countryCode={match.country} className="text-xs" />
+                                    <Image
+                                            src={`/flags/${match.country_name.toLowerCase()}.png`}
+                                            alt="Bookie"
+                                            width={15}
+                                            height={15}
+                                            className="block hidden sm:block"
+                                          />                                      
                                       <div className="flex flex-col">
                                         <div className="text-xs font-bold text-kvotizza-green-600 dark:text-kvotizza-dark-theme-green-">
                                           {formatMatchLabel(match.start_time)}
