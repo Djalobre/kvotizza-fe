@@ -140,6 +140,8 @@ class SportsConfigService {
       matchup: this.extractValue(rawData, fieldMappings.matchup || ["matchup"]),
       league: this.extractValue(rawData, fieldMappings.league || ["league"]),
       start_time: this.extractValue(rawData, fieldMappings.start_time || ["start_time"]),
+      country_name: this.extractValue(rawData, fieldMappings.country_name || ["country_name"]),
+
       quickMarkets: {},
     }
 
