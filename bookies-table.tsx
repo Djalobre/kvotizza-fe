@@ -1027,15 +1027,15 @@ export default function Component({}: BookiesTableProps) {
                               >   
                               {categories.map((category) => (
                                   <DropdownMenuItem
-                                    key={category}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`rounded-none px-4 py-2 text-xs font-small transition-all border-b-2
-                                  ${selectedCategory === category
-                                    ? "dark:bg-kvotizza-dark-bg-20 bg-gray-50 dark:hover:bg-kvotizza-dark-bg-20 text-white dark:text-white "
-                                    : "text-white/50 hover:bg-muted border-transparent dark:bg-kvotizza-dark-bg-20 bg-gray-50  dark:hover:bg-kvotizza-dark-bg-20 "}`}
-                              >
-                                    {category}
-                                  </DropdownMenuItem>
+                                  key={category}
+                                  onClick={() => setSelectedCategory(category)}
+                                  className={`rounded-none px-4 py-2 text-xs font-small transition-all border-b-2
+                                    ${selectedCategory === category
+                                      ? "dark:bg-kvotizza-dark-bg-20 bg-gray-50 dark:hover:bg-kvotizza-dark-bg-20 text-black dark:text-white "
+                                      : "text-black/50 hover:bg-gray-50 dark:bg-kvotizza-dark-bg-20 bg-gray-50  dark:text-white/50  dark:hover:bg-kvotizza-dark-bg-20 "}`}
+                                >
+                                  {category}
+                                </DropdownMenuItem>
                                 ))}
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -1046,7 +1046,7 @@ export default function Component({}: BookiesTableProps) {
                           }
                           {/* Dynamic Quick Market Columns */}
                           {quickMarkets.map((market) => (
-                            <TableHeadMini key={market.key} className="font-semibold text-center bg-white dark:bg-kvotizza-dark-bg-20 text-xs sm:text-sm dark:text-white">
+                            <TableHeadMini key={market.key} className="font-semibold text-left sm:pl-8 bg-white dark:bg-kvotizza-dark-bg-20 text-xs sm:text-sm dark:text-white">
                               {market.displayName}
                             </TableHeadMini>
                           ))}
@@ -1127,9 +1127,9 @@ export default function Component({}: BookiesTableProps) {
                                   return (
                                     <TableCell key={`${match.id}-${market.key}`} className="text-center">
                                       {quickMarket ? (
-                                        <div className="flex flex-col items-left gap-1 px-1 sm:px-4 items-center">
+                                        <div className="flex flex-col gap-1 px-1 sm:pl-6 items-left">
                                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                                                    <Image
+                                                <Image
                                             src={`/images/${quickMarket.bestBookie.toLowerCase()}.png`}
                                             alt="Bookie"
                                             width={20}
@@ -1150,7 +1150,9 @@ export default function Component({}: BookiesTableProps) {
                                           />
                                         </div>
                                       ) : (
-                                        <span className="text-muted-foreground">-</span>
+                                        <div className="flex flex-col gap-1 px-1 sm:pl-12 items-left">
+                                        <span className="flex items-center gap-1 text-xs text-muted-foreground">-</span>
+                                        </div>
                                       )}
                                     </TableCell>
                                   )
