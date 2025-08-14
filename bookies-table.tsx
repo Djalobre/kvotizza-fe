@@ -280,6 +280,7 @@ export default function Component({}: BookiesTableProps) {
       }
 
       setAllMatches(matches)
+
     } catch (error) {
       console.error("Error fetching matches:", error)
       setError(error instanceof Error ? error.message : "Failed to load matches")
@@ -516,7 +517,7 @@ export default function Component({}: BookiesTableProps) {
                     <div className="flex items-center gap-2 min-w-0 pr-4">
                       {/* <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">View:</span> */}
                       <div className="pl-4 flex gap-1">
-                        <Button
+                      <Button
                           variant={viewMode === "time" ? "default" : "outline"}
                           size="sm"
                           onClick={() => handleViewModeChange("time")}
@@ -529,6 +530,9 @@ export default function Component({}: BookiesTableProps) {
                           }
                         `}
                         >
+                          <Clock className="h-3 w-3" />
+                          Vreme
+                        </Button>
                         <Button
                           variant={viewMode === "league" ? "default" : "outline"}
                           size="sm"
@@ -545,10 +549,7 @@ export default function Component({}: BookiesTableProps) {
                           <List className="h-3 w-3" />
                           Takmičenja  
                         </Button>
-                        
-                          <Clock className="h-3 w-3" />
-                          Vreme
-                        </Button>
+
                       </div>
                     </div>
 
@@ -641,7 +642,8 @@ export default function Component({}: BookiesTableProps) {
                   <div className="flex items-center justify-between gap-2 fold:gap-1">
                     {/* View Mode Toggle */}
                     <div className="flex gap-1">
-                                            <Button
+
+                      <Button
                         variant={viewMode === "time" ? "default" : "outline"}
                         size="sm"
                         onClick={() => handleViewModeChange("time")}
@@ -654,6 +656,9 @@ export default function Component({}: BookiesTableProps) {
                         }
                       `}
                       >
+                        <Clock className="h-3 fold:h-2 w-3 fold:w-2" />
+                        {!isVeryNarrow && "Vreme"}
+                      </Button>
                       <Button
                         variant={viewMode === "league" ? "default" : "outline"}
                         size="sm"
@@ -669,10 +674,6 @@ export default function Component({}: BookiesTableProps) {
                       >
                         <List className="h-3 fold:h-2 w-3 fold:w-2" />
                         {!isVeryNarrow && "Takmičenje"}
-                      </Button>
-
-                        <Clock className="h-3 fold:h-2 w-3 fold:w-2" />
-                        {!isVeryNarrow && "Vreme"}
                       </Button>
                     </div>
 
@@ -987,7 +988,7 @@ export default function Component({}: BookiesTableProps) {
                                             width={15}
                                             height={15}
                                             className="block hidden sm:block"
-                                          />                                      
+                                          />
                                       <div className="flex flex-col">
                                         <div className="text-xs font-bold text-kvotizza-green-600 dark:text-kvotizza-dark-theme-green-">
                                           {formatMatchLabel(match.start_time)}
