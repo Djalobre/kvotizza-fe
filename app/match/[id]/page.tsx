@@ -278,7 +278,7 @@ export default function MatchPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-6 w-6 p-0 bg-kvotizza-green-50 hover:bg-kvotizza-green-100 border-kvotizza-green-200 dark:bg-kvotizza-dark-bg-10"
+                        className="h-6 w-6 p-0 bg-kvotizza-green-50 hover:bg-kvotizza-green-100 border-kvotizza-green-200 dark:bg-kvotizza-dark-bg-20"
                         onClick={() => {
                           const bestOdds = getBestOdds(match, categoryName, betType)
                           if (bestOdds) {
@@ -356,7 +356,7 @@ export default function MatchPage() {
                               {odds ? (
                                 <>
                                 <div className="flex items-center gap-1">
-                                <span className="text-xs md:text-sm fold:text-xs font-bold text-center">
+                                <span className="text-xs md:text-sm fold:text-xs font-bold text-center dark:text-white">
                                   {odds.toFixed(2)}
                                   </span>
                             {(trend === "up" || trend === "down") && (
