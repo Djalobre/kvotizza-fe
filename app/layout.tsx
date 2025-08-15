@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Kvotizza",
   description: "Uporedi kvote za sportsko klađenje",
+  icons: {
+  icon: "/logo.png", // or .png if you use PNG
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
