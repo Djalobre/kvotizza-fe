@@ -39,6 +39,7 @@ import {
   Trophy,
   Filter,
   Volleyball,
+  ChevronLeft,
 } from "lucide-react"
 import type { BasicMatch, DetailedMatch, BetTypeSelection, Bookie } from "./types/bookies"
 import { ClickableBetType } from "./components/clickable-bet-type"
@@ -457,7 +458,7 @@ export default function Component({}: BookiesTableProps) {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading {currentSportConfig?.displayName || selectedSport} matches...</p>
+          <p className="text-muted-foreground">Učitava mečeve...</p>
         </div>
       </div>
     )
@@ -468,7 +469,7 @@ export default function Component({}: BookiesTableProps) {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4 max-w-md">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
-          <h2 className="text-xl font-semibold">Failed to Load Matches</h2>
+          <h2 className="text-xl font-semibold">Bezuspešno učitavanje mečeva</h2>
           <p className="text-muted-foreground">{error}</p>
           <Button onClick={retryFetch} className="mt-4">
             Try Again
@@ -1166,7 +1167,7 @@ export default function Component({}: BookiesTableProps) {
                                       <div className="text-center py-4 fold:py-2">
                                         <Loader2 className="h-6 fold:h-4 w-6 fold:w-4 animate-spin mx-auto mb-2 fold:mb-1" />
                                         <p className="text-muted-foreground text-sm fold:text-xs">
-                                          Loading detailed odds...
+                                          Učitava kvote...
                                         </p>
                                       </div>
                                     ) : detailedMatches[match.id] ? (
@@ -1186,7 +1187,7 @@ export default function Component({}: BookiesTableProps) {
                                               }}
                                             >
                                               <ExternalLink className="h-3 fold:h-2 w-3 fold:w-2" />
-                                              {isVeryNarrow ? "Open" : "Open Match"}
+                                              {isVeryNarrow ? "Otvori" : "Otvori meč"}
                                             </Button>
                                           </div>
                                         </div>
@@ -1326,16 +1327,16 @@ export default function Component({}: BookiesTableProps) {
           {/* Simplified Pagination for narrow screens */}
           {totalFilteredMatches > itemsPerPage && (
             <Card>
-              <CardContent className="p-2 fold:p-1">
+              <CardContent className="p-2 fold:p-1  dark:bg-kvotizza-dark-bg-20">
                 <div className="flex flex-col gap-2 fold:gap-1">
                   {/* Items per page selector - simplified */}
                   <div className="flex items-center justify-center gap-2 fold:gap-1">
-                    <span className="text-xs fold:text-[0.6rem] text-muted-foreground">Show:</span>
+                    <span className="text-xs fold:text-[0.6rem] text-muted-foreground  dark:bg-kvotizza-dark-bg-20">Prikaži:</span>
                     <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                      <SelectTrigger className="w-16 fold:w-12 h-6 fold:h-5 text-xs fold:text-[0.6rem]">
+                      <SelectTrigger className="w-16 fold:w-12 h-6 fold:h-5 text-xs fold:text-[0.6rem]  dark:bg-kvotizza-dark-bg-10">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent  className="dark:bg-kvotizza-dark-bg-20">
                         <SelectItem value="10">10</SelectItem>
                         <SelectItem value="15">15</SelectItem>
                         <SelectItem value="25">25</SelectItem>
@@ -1345,7 +1346,7 @@ export default function Component({}: BookiesTableProps) {
 
                   {/* Page info */}
                   <div className="text-xs fold:text-[0.6rem] text-muted-foreground text-center">
-                    Page {currentPage} of {totalPages}
+                    Strana {currentPage} od {totalPages}
                   </div>
 
                   {/* Simplified pagination buttons */}
@@ -1357,7 +1358,7 @@ export default function Component({}: BookiesTableProps) {
                       disabled={currentPage === 1}
                       className="bg-transparent h-6 fold:h-5 px-2 fold:px-1 text-xs fold:text-[0.6rem]"
                     >
-                      Prev
+                      <ChevronLeft></ChevronLeft>
                     </Button>
 
                     <span className="text-xs fold:text-[0.6rem] px-2 fold:px-1">{currentPage}</span>
@@ -1367,9 +1368,9 @@ export default function Component({}: BookiesTableProps) {
                       size="sm"
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage >= totalPages}
-                      className="bg-transparent h-6 fold:h-5 px-2 fold:px-1 text-xs fold:text-[0.6rem]"
+                      className="bg-transparent h-6 fold:h-5 px-2 fold:px-1 text-xs fold:text-[0.6rem] "
                     >
-                      Next
+                      <ChevronRight></ChevronRight>
                     </Button>
                   </div>
                 </div>
@@ -1379,8 +1380,8 @@ export default function Component({}: BookiesTableProps) {
 
             {/* Results Summary */}
             <div className="text-center text-sm text-muted-foreground">
-              Showing {Math.min(startIndex + 1, totalFilteredMatches)} to {Math.min(endIndex, totalFilteredMatches)} of{" "}
-              {totalFilteredMatches} {currentSportConfig?.displayName || selectedSport} matches
+              Prikazuje {Math.min(startIndex + 1, totalFilteredMatches)} do {Math.min(endIndex, totalFilteredMatches)} od {" "}
+              {totalFilteredMatches} mečeva
               {(searchTerm || leagueFilter !== "all") && (
                 <span className="ml-2 text-kvotizza-blue-600">(filtered from {allMatches.length} total)</span>
               )}
