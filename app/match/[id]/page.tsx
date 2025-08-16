@@ -28,16 +28,24 @@ const getTrendsValue = (bookie: Bookie, category: string, type: string): string 
   const odd = cat.odds.find((o) => o.type === type)
   return odd ? odd.trend : null
 }
+
+const CATEGORY_PRIORITY = ["Konačan ishod", "Ukupno golova", "Oba tima daju gol","Prvo poluvreme","Drugo poluvreme"];
+
 // Helper function to get all unique categories from match data
 const getAllCategories = (match: DetailedMatch): string[] => {
-  const categories = new Set<string>()
+  const set = new Set<string>();
   match.bookies.forEach((bookie: Bookie) => {
-    bookie.categories.forEach((category) => {
-      categories.add(category.category)
-    })
-  })
-  return Array.from(categories).sort()
-}
+    bookie.categories.forEach((category) => set.add(category.category));
+  });
+
+  // Priority first, then alphabetical (Serbian collation)
+  return Array.from(set).sort((a, b) => {
+    const pa = catPriority(a);
+    const pb = catPriority(b);
+    if (pa !== pb) return pa - pb;
+    return a.localeCompare(b, "sr");
+  });
+};
 
 // Helper function to get all bet types for a specific category
 const getBetTypesForCategory = (match: DetailedMatch, categoryName: string): string[] => {
