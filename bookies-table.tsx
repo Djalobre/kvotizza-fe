@@ -72,25 +72,31 @@ const getOddsTrend = (bookie: Bookie, category: string, type: string): string | 
 
 // Helper function to get all unique bet types across all bookies for a match
 const getAllBetTypesForMatch = (match: DetailedMatch): { category: string; type: string }[] => {
-  const allTypes = new Map<string, { category: string; type: string }>()
+  const allTypes = new Map<string, { category: string; type: string }>();
+
   match.bookies.forEach((bookie: Bookie) => {
     bookie.categories.forEach((categoryObj) => {
       categoryObj.odds.forEach((odd) => {
-        const key = `${categoryObj.category}|${odd.type}`
+        const key = `${categoryObj.category}|${odd.type}`;
         if (!allTypes.has(key)) {
-          allTypes.set(key, { category: categoryObj.category, type: odd.type })
+          allTypes.set(key, { category: categoryObj.category, type: odd.type });
         }
-      })
-    })
-  })
-  // Sort for consistent order in expanded view
-  return Array.from(allTypes.values()).sort((a, b) => {
-    const categoryCompare = a.category.localeCompare(b.category)
-    if (categoryCompare !== 0) return categoryCompare
-    return a.type.localeCompare(b.type)
-  })
-}
+      });
+    });
+  });
 
+  // Sort: priority categories first, then by category name, then by type
+  return Array.from(allTypes.values()).sort((a, b) => {
+    const pa = catPriority(a.category);
+    const pb = catPriority(b.category);
+    if (pa !== pb) return pa - pb;
+
+    const categoryCompare = a.category.localeCompare(b.category, "sr");
+    if (categoryCompare !== 0) return categoryCompare;
+
+    return a.type.localeCompare(b.type, "sr");
+  });
+};
 // Helper to group bet types by category for the detailed table
 const getTypesByCategory = (match: DetailedMatch): Record<string, { category: string; type: string }[]> => {
   const categories: Record<string, { category: string; type: string }[]> = {}
