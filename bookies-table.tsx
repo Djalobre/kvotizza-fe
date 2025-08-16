@@ -69,9 +69,10 @@ const getOddsTrend = (bookie: Bookie, category: string, type: string): string | 
   const odd = cat.odds.find((o) => o.type === type)
   return odd ? odd.trend : null
 }
+const CATEGORY_PRIORITY = ["Konačan ishod", "Ukupno golova", "Oba tima daju gol","Prvo poluvreme","Drugo poluvreme"];
 const catPriority = (cat: string) => {
   const i = CATEGORY_PRIORITY.indexOf(cat);
-  return i === -1 ? CATEGORY_PRIORITY.length : i; // non-priority after the first three
+  return i === -1 ? CATEGORY_PRIORITY.length : i; // non-priority go after the first three
 };
 // Helper function to get all unique bet types across all bookies for a match
 const getAllBetTypesForMatch = (match: DetailedMatch): { category: string; type: string }[] => {
