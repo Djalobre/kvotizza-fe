@@ -30,7 +30,10 @@ const getTrendsValue = (bookie: Bookie, category: string, type: string): string 
 }
 
 const CATEGORY_PRIORITY = ["Konačan ishod", "Ukupno golova", "Oba tima daju gol","Prvo poluvreme","Drugo poluvreme"];
-
+const catPriority = (cat: string) => {
+  const i = CATEGORY_PRIORITY.indexOf(cat);
+  return i === -1 ? CATEGORY_PRIORITY.length : i; // non-priority after the first three
+};
 // Helper function to get all unique categories from match data
 const getAllCategories = (match: DetailedMatch): string[] => {
   const set = new Set<string>();
