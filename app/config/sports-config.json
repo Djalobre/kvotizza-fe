@@ -63,6 +63,36 @@
             "odds": ["quickMarkets.ukupnoGolova3Plus.bestOdds"],
             "bookie": ["quickMarkets.ukupnoGolova3Plus.bestBookie"]
           }
+        },
+                {
+          "key": "obaTimaDajuGol3Plus",
+          "category": "Oba tima daju gol",
+          "type": "GG3+",
+          "displayName": "GG3+",
+          "apiMappings": {
+            "odds": ["quickMarkets.obaTimaDajuGol3Plus.bestOdds"],
+            "bookie": ["quickMarkets.obaTimaDajuGol3Plus.bestBookie"]
+          }
+        },
+        {
+          "key": "obaTimaDajuGolPP",
+          "category": "Oba tima daju gol",
+          "type": "GG1",
+          "displayName": "GG1",
+          "apiMappings": {
+            "odds": ["quickMarkets.obaTimaDajuGolPP.bestOdds"],
+            "bookie": ["quickMarkets.obaTimaDajuGolPP.bestBookie"]
+          }
+        },
+        {
+          "key": "obaTimaDajuGolDP",
+          "category": "Oba tima daju gol",
+          "type": "GG2",
+          "displayName": "GG2",
+          "apiMappings": {
+            "odds": ["quickMarkets.obaTimaDajuGolDP.bestOdds"],
+            "bookie": ["quickMarkets.obaTimaDajuGolDP.bestBookie"]
+          }
         }
       ],
       "fieldMappings": {
