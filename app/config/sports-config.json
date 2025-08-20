@@ -64,7 +64,7 @@
             "bookie": ["quickMarkets.ukupnoGolova3Plus.bestBookie"]
           }
         },
-                {
+        {
           "key": "obaTimaDajuGol3Plus",
           "category": "Oba tima daju gol",
           "type": "GG3+",
@@ -152,7 +152,7 @@
     }
   },
   "defaultDateSpan": "naredna3dana",
-  "defaultCategory": "Konačan ishod"
+  "defaultCategory": "Konačan ishod",
   "defaultMarketDeviation": "Fudbal",
   "defaultCompetition": "Engleska 1",
   "defaultDate": "2026-01-01"
