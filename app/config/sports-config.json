@@ -110,7 +110,11 @@
     "endpoints": {
       "matches": "/matches",
       "matchDetails": "/matches/{id}",
-      "categories": "/categories"
+      "categories": "/categories",
+      "market_deviations": "/market-deviations",
+      "daily_picks": "/picks/daily",
+      "matchup_events": "/matchup-events",
+      "top_matches": "/top-matches"
     },
     "queryParams": {
       "sport": "sport",
@@ -149,4 +153,7 @@
   },
   "defaultDateSpan": "naredna3dana",
   "defaultCategory": "Konačan ishod"
+  "defaultMarketDeviation": "Fudbal",
+  "defaultCompetition": "Engleska 1",
+  "defaultDate": "2026-01-01"
 }
