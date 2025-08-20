@@ -14,6 +14,52 @@ export class ApiService {
     return ApiService.instance
   }
 
+  async getMatchupEvents(
+    sport?: string,
+    date?: string,
+    league?: string
+  ): Promise<BasicMatch[]> {
+    try {
+      const params = new URLSearchParams()
+
+
+      // Always add sport parameter
+      if (sport) {
+        params.append("sport", sport)
+      }
+
+      // Always add dateSpan parameter - use default if not provided
+      const eventDate = date || sportsConfigService.getDefaultDate()
+      params.append("date", eventDate)
+
+      // Add other optional parameters
+      if (league) params.append("league", league)
+      const response = await fetch(`/api/matchup-events?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch matchup events: ${response.status} ${response.statusText}`)
+      }
+      
+      const data = await response.json();
+      console.log(data)
+
+      // Handle different response formats
+      if (Array.isArray(data)) {
+        return data
+      } else if (data && typeof data === "object") {
+        return data.matches || data.data || data.results || data.legs || []
+      }
+
+      return []
+    } catch (error) {
+      console.error("Error in matchupEvents:", error)
+      throw error
+    }
+  }
 
 
   async getCategories(
