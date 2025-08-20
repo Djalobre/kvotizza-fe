@@ -40,11 +40,17 @@ export interface SportsConfig {
   }
   defaultSport: string
   defaultMarketGroup?: string
+  defaultCompetition?: string
+  defaultDate?: string
   apiConfig: {
     endpoints: {
       matches: string
       matchDetails: string
       categories: string
+      market_deviations: string
+      daily_picks: string
+      matchup_events: string
+      top_matches: string
     }
     queryParams: {
       [key: string]: string
@@ -53,9 +59,12 @@ export interface SportsConfig {
   dateSpans: {
     [key: string]: DateSpan
   }
+
   defaultDateSpan: string
 
   defaultCategory: string
+
+  defaultMarketDeviation: string
 }
 
 class SportsConfigService {
@@ -110,6 +119,21 @@ class SportsConfigService {
   // Get default sport
   getDefaultSport(): string {
     return this.config.defaultSport
+  }
+
+  getDefaultCompetition():string {
+    return this.config.defaultCompetition  || "Engleska 1"
+  }
+  getTodayDate(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  getDefaultDate():string {
+    
+    return this.config.defaultDate || this.getTodayDate()
   }
 
   // Get API configuration
@@ -203,6 +227,11 @@ class SportsConfigService {
     return this.config.dateSpans?.[dateSpan] || null
   }
 
+    // Get configuration for a specific date span
+    getDateConfig(date: string): DateSpan | null {
+      return this.config.dateSpans?.[date] || null
+    }
+  
   // Get default date span
   getDefaultDateSpan(): string {
     return this.config.defaultDateSpan || "naredna3dana"
@@ -211,6 +240,7 @@ class SportsConfigService {
   getDefaultCategory(): string {
     return this.config.defaultCategory || "Konačan ishod"
   }
+  
 
   // Get available date spans list for UI
   getDateSpansList(): Array<{ key: string; displayName: string; description: string; apiValue: string }> {
