@@ -148,7 +148,14 @@ export class ApiService {
       throw error
     }
   }
+  saveTopMatches = async (body: { pick_date: string; sport: string; created_by: string; matches: any[] }) => {
+    await fetch(`/api/top-matches`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
 
+}
   async searchMatches(query: string, sport?: string, dateSpan?: string): Promise<BasicMatch[]> {
     try {
       const params = new URLSearchParams()
