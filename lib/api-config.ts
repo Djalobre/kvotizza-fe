@@ -1,6 +1,7 @@
 // API Configuration - Single unified endpoint
 export const API_CONFIG = {
     baseUrl:  "https://api.kvotizza.online/api",  
+
     // Single endpoint that handles all sports
     endpoints: {
       // Basic matches endpoint - sport passed as query parameter
@@ -9,6 +10,14 @@ export const API_CONFIG = {
       // Categories endpoint - no sport parameter, returns all categories
       categories: `https://api.kvotizza.online/api/categories`,
 
+      market_deviations: `https://api.kvotizza.online/market-deviations`,
+
+      // Daily picks endpoint - no sport parameter, returns all daily picks
+      daily_picks: `https://api.kvotizza.online/api/picks/daily`,
+
+      matchup_events: `https://api.kvotizza.online/matchup-events`,
+
+      top_matches: `https://api.kvotizza.online/api/top-matches`,
       // Detailed match endpoint - sport passed as query parameter
       matchDetails: (matchId: number) =>
         `https://api.kvotizza.online/api/matches/${matchId}`,
@@ -19,7 +28,6 @@ export const API_CONFIG = {
     timeout: 10000,
     retries: 3,
   }
-  
   // Helper function to build headers for your API requests
   export const getApiHeaders = () => ({
     "Content-Type": "application/json",
