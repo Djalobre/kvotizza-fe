@@ -45,6 +45,7 @@ export interface SportsConfig {
     [key: string]: DateSpan
   }
   defaultDateSpan: string
+  defaultDate?: string
 }
 
 class SportsConfigService {
@@ -184,6 +185,17 @@ class SportsConfigService {
   getDefaultDateSpan(): string {
     return this.config.defaultDateSpan || "next7days"
   }
+  getTodayDate(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  getDefaultDate():string {
+    return this.config.defaultDate || this.getTodayDate()
+  }
+  
 
   // Get available date spans list for UI
   getDateSpansList(): Array<{ key: string; displayName: string; description: string; apiValue: string }> {
