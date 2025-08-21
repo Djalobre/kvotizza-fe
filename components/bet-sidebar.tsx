@@ -203,7 +203,7 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarP
                       value={stakeInput}
                       onChange={handleStakeChange}
                       onBlur={handleStakeBlur}
-                      className="mt-1 bg-white dark:bg-kvotizza-dark-bg-20 dark:border dark:border-white/30"
+                      className="mt-1 bg-white dark:bg-kvotizza-dark-bg-10 dark:border dark:border-white/30"
                       // Optional: stop scroll wheel changing value on desktop mice
                       onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
                       // Optional: block e/E/+/- which some browsers allow in number fields
@@ -224,8 +224,8 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarP
                   variant="outline"
                   className={`
                     w-full flex items-center gap-2
-                    dark:border dark:border-white/30 dark:bg-transparent bg-white
-                    text-kvotizza-blue-700 dark:hover:bg-black/30 hover:bg-kvotizza-blue-50
+                    dark:border dark:border-white/30 dark:bg-kvotizza-dark-bg-10 bg-white
+                    text-kvotizza-blue-700 dark:hover:bg-black/20 hover:bg-kvotizza-blue-50
                     dark:hover:text-dark-theme-kvotizza-blue-10 dark:text-white
                     disabled:opacity-50 disabled:cursor-not-allowed
                   `}
