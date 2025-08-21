@@ -14,6 +14,43 @@ export class ApiService {
     return ApiService.instance
   }
 
+  async getTopMatches(
+    date?: string,
+  ): Promise<TopMatches[]> {
+    try {
+      const params = new URLSearchParams()
+      const eventDate = date || sportsConfigService.getDefaultDate()
+      params.append("date", eventDate)
+      // Always add sport parameter
+
+
+      const response = await fetch(`/api/top-matches?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch market deviations: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json();
+
+      console.log(data)
+      // Handle different response formats
+      if (Array.isArray(data)) {
+        return data
+      } else if (data && typeof data === "object") {
+        return data.matches || data.data || data.results || []
+      }
+
+      return []
+    } catch (error) {
+      console.error("Error in getMarketDeviations:", error)
+      throw error
+    }
+  }
+  
   async getMatchupEvents(
     sport?: string,
     date?: string,
