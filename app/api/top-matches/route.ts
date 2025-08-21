@@ -4,6 +4,7 @@ import { API_CONFIG, apiRequest, getApiHeaders } from "@/lib/api-config"
 import { sportsConfigService } from "@/lib/sports-config"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { TopMatches } from "@/types/bookies";
 
 // ——— Tipovi (opciono, zbog boljeg DX) ———
 type BetItem = {
@@ -86,3 +87,55 @@ export async function POST(request: Request) {
   }
 }
     
+
+export async function GET(request: Request) {
+  try {
+    // Parse URL parameters for filtering
+    const { searchParams } = new URL(request.url)
+    const date = searchParams.get("date") || sportsConfigService.getDefaultDate()
+
+
+
+    // Build query parameters for your API
+    const apiConfig = sportsConfigService.getApiConfig()
+    const queryParams = new URLSearchParams()
+    // Add sport parameter
+    queryParams.set("date", date)
+
+    // Add date span parameter using the API value from config
+
+
+
+    // Construct the API URL with query parameters
+    const apiUrl = `${API_CONFIG.baseUrl}${'/top-matches'}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`
+    console.log(apiUrl, "Fetching top matches from API")
+    // Call your real API
+    const response = await apiRequest(apiUrl)
+    const data = await response.json()
+
+    // Transform your API response using sport-specific configuration
+    let top_matches: any[] = []
+
+    // Handle different API response formats
+    if (Array.isArray(data)) {
+      top_matches = data
+    } else if (data && typeof data === "object") {
+      top_matches = data.matches || data.data || data.results || []
+    }
+    const topMatchesData: TopMatches[] = top_matches
+
+
+    // Return simple array for client-side filtering and pagination
+    return NextResponse.json(topMatchesData)
+  } catch (error) {
+    console.error("Error fetching categories from real API:", error)
+
+    return NextResponse.json(
+      {
+        error: "Failed to fetch categories",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
+  }
+}
