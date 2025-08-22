@@ -32,8 +32,21 @@ export function BetOfTheDay({ marketDeviation }: BetOfTheDayProp) {
     <Card className="shadow-md dark:bg-kvotizza-dark-bg-20">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-sport-yellow-500" />
-          Kvota dana
+          <Image
+            src="/images/kvotizza-logo.png"
+            alt="Kvotizza Logo"
+            width={30}
+            height={30}
+            className="block dark:hidden h-10 w-auto"
+          />
+          <Image
+            src="/images/kvotizza-logo-white.png"
+            alt="Kvotizza Logo"
+            width={30}
+            height={30}
+            className="h-10 w-auto hidden dark:block"
+          />{' '}
+          Kvotizza dana
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -66,7 +79,7 @@ export function BetOfTheDay({ marketDeviation }: BetOfTheDayProp) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge className="text-white bg-kvotizza-green-400">
+              <Badge className="text-white bg-kvotizza-green-400 hover:bg-kvotizza-green-400 dark:hover:bg-kvotizza-green-400">
                 +{marketDeviation.odstupanje.toFixed(2)}%
               </Badge>
               <span className="text-sm text-muted-foreground ">u odnosu na tržište</span>
@@ -74,7 +87,7 @@ export function BetOfTheDay({ marketDeviation }: BetOfTheDayProp) {
             <div className="pt-2">
               <Button
                 variant="outline"
-                className="bg-transparent dark:bg-kvotizza-dark-bg-10 dark:text-white/80 dark:hover:bg-black/20"
+                className="bg-transparent dark:bg-kvotizza-dark-bg-10 dark:text-white/80 dark:border dark:border-white/30 dark:hover:bg-black/20"
                 onClick={() => alert('Preview: Detalji meča')}
               >
                 Detalji meča
