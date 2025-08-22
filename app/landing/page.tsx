@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { bookiesData } from '../../lib/data'
 import type {
   BookiesData,
   Match,
@@ -117,7 +116,6 @@ function best1X2ForMatch(match: Match) {
 }
 
 export default function Landing() {
-  const best = findBestOddOfDay(bookiesData)
   const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
   const [allMarketDeviations, setMarketDeviations] = useState<MarketDeviation[]>([]) // Store all matches from API
   const [allTopMatches, setTopMatches] = useState<TopMatches[]>([]) // Store all matches from API
