@@ -239,7 +239,7 @@ export default function Landing() {
   const topMatches = allTopMatches
 
   const onCTA = useCallback(() => {
-    window.location.href = '/kvote?sport=fudbal&datespan=sve'
+    window.location.href = '/kvote?sport=fudbal&datespan=danas'
   }, [])
 
   const onOpenTickets = useCallback(() => {
@@ -366,7 +366,10 @@ export default function Landing() {
           <h3 className="text-xl font-semibold mb-4">Brzi hubovi</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {/* {['Fudbal', 'Engleska 1', 'Italija 1', 'Španija 1', 'Srbija 1', 'Nemačka 1'].map( */}
-            <button key={'Fudbal'} onClick={() => alert(`Preview`)}>
+            <button key={'Fudbal'} onClick={(e) => {
+                e.stopPropagation()
+                navigateToQuickHub('sport=fudbal')
+              }}>
               <Card className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4 text-center font-medium">Fudbal</CardContent>
               </Card>
