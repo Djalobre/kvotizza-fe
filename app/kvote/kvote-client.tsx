@@ -253,57 +253,58 @@ export function addBetToBuilder(
   // Dispatch custom event to notify sidebar
   window.dispatchEvent(new CustomEvent('betTypeSelectionsUpdated'))
 }
-export default function KvoteClient({}: BookiesTableProps) {
-  const [allMatches, setAllMatches] = useState<BasicMatch[]>([]) // Store all matches from API
+export default function KvoteClient({
+  initialQuery,
+}: {
+  initialQuery: InitialQuery
+}) {
+  // --- STATE ---
+  const [allMatches, setAllMatches] = useState<BasicMatch[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [detailedMatches, setDetailedMatches] = useState<{ [key: number]: DetailedMatch }>({})
   const [loadingMatches, setLoadingMatches] = useState<boolean>(true)
   const [loadingDetails, setLoadingDetails] = useState<{ [key: number]: boolean }>({})
   const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [leagueFilter, setLeagueFilter] = useState<string>('all')
+  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [leagueFilter, setLeagueFilter] = useState<string>("all")
   const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    sportsConfigService.getDefaultCategory()
-  )
-
-  const [selectedDateSpan, setSelectedDateSpan] = useState<string>(
-    sportsConfigService.getDefaultDateSpan()
-  )
+  const [selectedCategory, setSelectedCategory] = useState<string>(sportsConfigService.getDefaultCategory())
+  const [selectedDateSpan, setSelectedDateSpan] = useState<string>(sportsConfigService.getDefaultDateSpan())
   const [analysisStake, setAnalysisStake] = useState<number>(10)
-
   const [expandedRows, setExpandedRows] = useState<number[]>([])
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
   const [analysisModalOpen, setAnalysisModalOpen] = useState<boolean>(false)
   const [analysisSelections, setAnalysisSelections] = useState<BetTypeSelection[]>([])
-  const [viewMode, setViewMode] = useState<ViewMode>('time')
-
+  const [viewMode, setViewMode] = useState<ViewMode>("time")
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [itemsPerPage, setItemsPerPage] = useState<number>(15)
 
-  // Mobile controls expansion state
+  // Mobile flags
+  const [isMobileView, setIsMobileView] = useState(false)
+  const [isVeryNarrow, setIsVeryNarrow] = useState(false)
   const [controlsExpanded, setControlsExpanded] = useState<boolean>(false)
   const [searchExpanded, setSearchExpanded] = useState<boolean>(false)
 
-  // Get current sport configuration
+  // Config
   const currentSportConfig = sportsConfigService.getSportConfig(selectedSport)
   const quickMarkets = sportsConfigService.getFEQuickMarkets(selectedSport, selectedCategory)
   const availableSports = sportsConfigService.getSportsList()
-
   const availableDateSpans = sportsConfigService.getDateSpansList()
   const currentDateSpanConfig = sportsConfigService.getDateSpanConfig(selectedDateSpan)
-  const [isMobileView, setIsMobileView] = useState(false)
-  const [isVeryNarrow, setIsVeryNarrow] = useState(false)
 
-  // URL sync
+  // --- URL sync (bez useSearchParams) ---
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const firstLoadSyncedRef = useRef(false)
 
-  // Upis jednog parametra u URL (bez reloada)
+  const readParams = () => {
+    if (typeof window === "undefined") return new URLSearchParams("")
+    return new URLSearchParams(window.location.search)
+  }
+
+  // Upis jednog parametra u URL
   const setParam = (key: string, value?: string | null) => {
-    const params = new URLSearchParams(searchParams?.toString() || '')
+    const params = readParams()
     if (value && value.length > 0) params.set(key, value)
     else params.delete(key)
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
@@ -311,41 +312,35 @@ export default function KvoteClient({}: BookiesTableProps) {
 
   // Upis više parametara odjednom
   const setParams = (entries: Record<string, string | undefined | null>) => {
-    const params = new URLSearchParams(searchParams?.toString() || '')
-    Object.entries(entries).forEach(([k, v]) => {
+    const params = readParams()
+    for (const [k, v] of Object.entries(entries)) {
       if (v && v.length > 0) params.set(k, v)
       else params.delete(k)
-    })
+    }
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
   }
+
+  // PRVI MOUNT: props -> state (nema Suspense)
   useEffect(() => {
     if (firstLoadSyncedRef.current) return
     firstLoadSyncedRef.current = true
 
-    const urlSport = searchParams.get('sport')
-    const urlDateSpan = searchParams.get('dateSpan')
-    const urlLeague = searchParams.get('league')
-    const urlView = searchParams.get('view') as ViewMode | null
-    const urlCategory = searchParams.get('category')
+    if (initialQuery.sport) setSelectedSport(initialQuery.sport)
+    if (initialQuery.dateSpan) setSelectedDateSpan(initialQuery.dateSpan)
+    if (initialQuery.league) setLeagueFilter(initialQuery.league)
+    if (initialQuery.view === "time" || initialQuery.view === "league") setViewMode(initialQuery.view)
+    if (initialQuery.category) setSelectedCategory(initialQuery.category)
+  }, [initialQuery])
 
-    if (urlSport) setSelectedSport(urlSport)
-    if (urlDateSpan) setSelectedDateSpan(urlDateSpan)
-    if (urlLeague) setLeagueFilter(urlLeague)
-    if (urlView === 'time' || urlView === 'league') setViewMode(urlView)
-    if (urlCategory) setSelectedCategory(urlCategory)
-    // ako ništa nije u URL-u, zadržavamo postojeće default state vrednosti
-    // (po želji, možeš ovde odmah da upišeš default vrednosti u URL koristeći setParams)
-    // npr: setParams({ sport: selectedSport, dateSpan: selectedDateSpan })
-  }, []) // run once
-
+  // Resize flags
   useEffect(() => {
     const update = () => {
       setIsMobileView(window.innerWidth < 640)
       setIsVeryNarrow(window.innerWidth <= 360)
     }
     update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
   }, [])
   // Fetch all matches data on component mount or sport change
   const fetchAllMatches = async () => {
@@ -400,36 +395,12 @@ export default function KvoteClient({}: BookiesTableProps) {
     fetchAllCategories()
   }, [selectedSport])
 
-  const handleSportChange = (sportKey: string) => {
-    setSelectedSport(sportKey)
-    setParam('sport', sportKey)
-    setCurrentPage(1)
-  }
+const handleSportChange = (s: string) => { setSelectedSport(s); setParam("sport", s); setCurrentPage(1) }
+const handleDateSpanChange = (d: string) => { setSelectedDateSpan(d); setParam("dateSpan", d); setCurrentPage(1) }
+const handleLeagueFilterUrl = (l: string) => { setLeagueFilter(l); setParam("league", l === "all" ? null : l); setCurrentPage(1) }
+const handleViewModeChangeUrl = (v: ViewMode) => { setViewMode(v); setParam("view", v); setCurrentPage(1); setExpandedRows([]) }
+const handleCategoryChange = (c: string) => { setSelectedCategory(c); setParam("category", c) }
 
-  const handleDateSpanChange = (spanKey: string) => {
-    setSelectedDateSpan(spanKey)
-    setParam('dateSpan', spanKey)
-    setCurrentPage(1)
-  }
-
-  const handleLeagueFilterUrl = (league: string) => {
-    logEvent('filter_change', { source: 'bookies-table', extra: { league: league || null } })
-    setLeagueFilter(league)
-    setParam('league', league === 'all' ? null : league)
-    setCurrentPage(1)
-  }
-
-  const handleViewModeChangeUrl = (newMode: ViewMode) => {
-    setViewMode(newMode)
-    setParam('view', newMode)
-    setCurrentPage(1)
-    setExpandedRows([])
-  }
-
-  const handleCategoryChange = (cat: string) => {
-    setSelectedCategory(cat)
-    setParam('category', cat)
-  }
 
   // Fetch detailed match data when row is expanded
   const fetchDetailedMatch = async (matchId: number) => {
