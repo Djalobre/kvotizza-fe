@@ -116,7 +116,6 @@ function best1X2ForMatch(match: Match) {
 }
 
 export default function Landing() {
-  const best = findBestOddOfDay(bookiesData)
   const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
   const [allMarketDeviations, setMarketDeviations] = useState<MarketDeviation[]>([]) // Store all matches from API
   const [allTopMatches, setTopMatches] = useState<TopMatches[]>([]) // Store all matches from API
