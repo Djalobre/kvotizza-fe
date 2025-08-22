@@ -95,7 +95,7 @@ export function DailyTicket({
 
                 {/* RIGHT: odds + link */}
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                  <div className="text-xl sm:text-2xl font-bold tabular-nums">
+                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-sport-green-500">
                     {b.odd ? Number(b.odd).toFixed(2) : 'N/A'}
                   </div>
                   <a
@@ -134,8 +134,8 @@ export function DailyTicket({
             </div>
 
             <div className="flex items-center justify-between md:justify-end gap-6 w-full">
-              <div className="text-sm text-muted-foreground">Ukupna kvota</div>
-              <div className="text-xl sm:text-2xl font-extrabold tabular-nums">
+              <div className="text-sm text-muted-foreground ">Ukupna kvota</div>
+              <div className="text-xl sm:text-2xl font-extrabold tabular-nums text-sport-green-500">
                 {bets.length ? totalOdds.toFixed(2) : '—'}
               </div>
             </div>
