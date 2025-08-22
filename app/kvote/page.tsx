@@ -1,10 +1,16 @@
-import { Suspense } from 'react'
-import KvoteClient from './kvote-client'
+// app/kvote/page.tsx
+import KvoteClient from "./kvote-client"
 
-export default function Page() {
-  return (
-    <Suspense fallback={<div>Učitavanje…</div>}>
-      <KvoteClient />
-    </Suspense>
-  )
+export default function Page({
+  searchParams,
+}: {
+  searchParams: {
+    sport?: string
+    dateSpan?: string
+    league?: string
+    view?: "time" | "league"
+    category?: string
+  }
+}) {
+  return <KvoteClient initialQuery={searchParams} />
 }
