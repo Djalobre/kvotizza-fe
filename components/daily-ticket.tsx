@@ -56,8 +56,6 @@ export function DailyTicket({
     <section className={['w-full ', className].filter(Boolean).join(' ')}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">{title}</h2>
-
         {/* Optional: place for "Otvori tikete X" */}
         {/* <button className="text-sm text-muted-foreground hover:underline">Otvori tikete 0</button> */}
       </div>
@@ -146,7 +144,8 @@ export function DailyTicket({
           {/* Actions */}
           <div className="mt-6">
             <Button
-              className="h-11 rounded-xl px-6 text-base dark:bg-kvotizza-dark-bg-10 dark:border dark:border-white/30 dark:text-white/80 dark:hover:bg-black/20"
+              variant="outline"
+              className="h-11 bg-transparent rounded-xl px-6 text-base dark:bg-kvotizza-dark-bg-10 dark:border dark:border-white/30 dark:text-white/80 dark:hover:bg-black/20"
               onClick={handleOpenTicket}
               disabled={!bets.length || !stake || stake <= 0}
             >
