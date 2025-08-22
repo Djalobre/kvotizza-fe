@@ -253,7 +253,7 @@ export function addBetToBuilder(
   // Dispatch custom event to notify sidebar
   window.dispatchEvent(new CustomEvent('betTypeSelectionsUpdated'))
 }
-export default function Component({}: BookiesTableProps) {
+export default function KvoteClient({}: BookiesTableProps) {
   const [allMatches, setAllMatches] = useState<BasicMatch[]>([]) // Store all matches from API
   const [categories, setCategories] = useState<string[]>([])
   const [detailedMatches, setDetailedMatches] = useState<{ [key: number]: DetailedMatch }>({})
