@@ -112,7 +112,7 @@
       "matchDetails": "/matches/{id}",
       "categories": "/categories",
       "market_deviations": "/market-deviations",
-      "daily_picks": "/picks/daily",
+      "daily_picks": "/daily-picks",
       "matchup_events": "/matchup-events",
       "top_matches": "/top-matches"
     },
