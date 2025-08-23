@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     // Call your real API
     const response = await apiRequest(apiUrl)
     const data = await response.json()
-
+    console.log(data,"Fetching data maybeee?")
     
     // Transform your API response using sport-specific configuration
     let dailyPicks: any[] = []
