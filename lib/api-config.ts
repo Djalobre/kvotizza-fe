@@ -13,7 +13,7 @@ export const API_CONFIG = {
       market_deviations: `https://api.kvotizza.online/market-deviations`,
 
       // Daily picks endpoint - no sport parameter, returns all daily picks
-      daily_picks: `https://api.kvotizza.online/api/picks/daily`,
+      daily_picks: `https://api.kvotizza.online/api/daily-picks`,
 
       matchup_events: `https://api.kvotizza.online/matchup-events`,
 
