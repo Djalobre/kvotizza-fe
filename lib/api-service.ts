@@ -1,4 +1,4 @@
-import type { BasicMatch, DetailedMatch } from "../types/bookies"
+import type { BasicMatch, DailyTicketLeg, DetailedMatch, MarketDeviation, TopMatches } from "../types/bookies"
 import { sportsConfigService } from "../services/sports-config-service" // Declare the variable before using it
 
 // Client-side API service
@@ -12,6 +12,44 @@ export class ApiService {
       ApiService.instance = new ApiService()
     }
     return ApiService.instance
+  }
+
+  async getMarketDeviations(
+    sport?: string,
+  ): Promise<MarketDeviation[]> {
+    try {
+      const params = new URLSearchParams()
+
+      // Always add sport parameter
+      if (sport) {
+        params.append("sport", sport)
+      }
+
+      const response = await fetch(`/api/market-deviations?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch market deviations: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json();
+
+
+      // Handle different response formats
+      if (Array.isArray(data)) {
+        return data
+      } else if (data && typeof data === "object") {
+        return data.matches || data.data || data.results || []
+      }
+
+      return []
+    } catch (error) {
+      console.error("Error in getMarketDeviations:", error)
+      throw error
+    }
   }
 
   async getTopMatches(
@@ -99,6 +137,7 @@ export class ApiService {
   }
 
 
+
   async getCategories(
     sport?: string,
   ): Promise<string[]> {
@@ -130,6 +169,39 @@ export class ApiService {
       return []
     } catch (error) {
       console.error("Error in getCategories:", error)
+      throw error
+    }
+  }
+
+  async getDailyPicks(
+  ): Promise<DailyTicketLeg[]> {
+    try {
+      const params = new URLSearchParams()
+
+
+      const response = await fetch(`/api/picks/daily`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`Failed to fetch daily picks deviations: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json();
+
+
+      // Handle different response formats
+      if (Array.isArray(data)) {
+        return data
+      } else if (data && typeof data === "object") {
+        return data.matches || data.data || data.results || data.legs || []
+      }
+
+      return []
+    } catch (error) {
+      console.error("Error in getDailyTicket:", error)
       throw error
     }
   }
@@ -231,14 +303,7 @@ export class ApiService {
       throw error
     }
   }
-  saveTopMatches = async (body: { pick_date: string; sport: string; created_by: string; matches: any[] }) => {
-    await fetch(`/api/top-matches`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
 
-}
   async searchMatches(query: string, sport?: string, dateSpan?: string): Promise<BasicMatch[]> {
     try {
       const params = new URLSearchParams()
@@ -256,6 +321,16 @@ export class ApiService {
       throw error
     }
   }
+
+  saveTopMatches = async (body: { pick_date: string; sport: string; created_by: string; matches: any[] }) => {
+    await fetch(`/api/top-matches`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+}
+
 }
 
 // Export singleton instance
