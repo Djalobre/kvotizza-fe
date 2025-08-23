@@ -370,7 +370,7 @@ export default function Landing() {
                 e.stopPropagation()
                 navigateToQuickHub('sport=fudbal')
               }}>
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Fudbal</CardContent>
               </Card>
             </button>
@@ -381,7 +381,7 @@ export default function Landing() {
                 navigateToQuickHub('sport=fudbal&league=Engleska 1')
               }}
             >
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Engleska 1</CardContent>
               </Card>
             </button>
@@ -392,7 +392,7 @@ export default function Landing() {
                 navigateToQuickHub('fudbal')
               }}
             >
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Srbija 1</CardContent>
               </Card>
             </button>
@@ -403,7 +403,7 @@ export default function Landing() {
                 navigateToQuickHub('fudbal')
               }}
             >
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Italija 1</CardContent>
               </Card>
             </button>
@@ -414,7 +414,7 @@ export default function Landing() {
                 navigateToQuickHub('fudbal')
               }}
             >
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Nemačka 1</CardContent>
               </Card>
             </button>
@@ -425,7 +425,7 @@ export default function Landing() {
                 navigateToQuickHub('fudbal')
               }}
             >
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Španija 1</CardContent>
               </Card>
             </button>
