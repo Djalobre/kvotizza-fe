@@ -179,7 +179,7 @@ export class ApiService {
       const params = new URLSearchParams()
 
 
-      const response = await fetch(`/api/picks/daily`, {
+      const response = await fetch(`/api/daily-picks`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
