@@ -193,7 +193,7 @@ export default function Landing() {
 
   const fetchDailyTicket = async () => {
     const data = await apiService.getDailyPicks()
-
+    console.log(data, 'This is daily ticket data')
     let daily_ticket: DailyTicketLeg[] = []
     if (Array.isArray(data)) {
       // API returns array directly: [{match1}, {match2}, ...]
