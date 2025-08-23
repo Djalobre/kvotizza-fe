@@ -3,6 +3,9 @@ import type {DailyTicket, DailyTicketLeg, MarketDeviation } from "../../../../ty
 import { API_CONFIG, apiRequest } from "../../../../lib/api-config"
 import { sportsConfigService } from "../../../../lib/sports-config"
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     // Build query parameters for your API
@@ -31,6 +34,7 @@ export async function GET(request: Request) {
     }
     const dailyPicksData: DailyTicketLeg[] = dailyPicks
 
+    console.log('[API /api/picks/daily] hit');
 
     // Return simple array for client-side filtering and pagination
     return NextResponse.json(dailyPicksData)
