@@ -125,10 +125,12 @@ export default function Landing() {
   const [analysisSelections, setAnalysisSelections] = useState<BetTypeSelection[]>([])
   const [analysisStake, setAnalysisStake] = useState<number>(200)
   const getTodayDate = (): string => {
-    const today = new Date()
-    return today.toISOString().split('T')[0] // Returns date in YYYY-MM-DD format
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`; // Returns date in YYYY-MM-DD format
   }
-
   const fetchMarketDeviations = async () => {
     const data = await apiService.getMarketDeviations(selectedSport)
 
