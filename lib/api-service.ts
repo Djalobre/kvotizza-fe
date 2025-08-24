@@ -173,39 +173,39 @@ export class ApiService {
     }
   }
 
-  async getDailyPicks(
-  ): Promise<DailyTicketLeg[]> {
+  async getDailyPicks(date?: string): Promise<DailyTicketLeg[]> {
     try {
       const params = new URLSearchParams()
 
+      const eventDate = date || sportsConfigService.getDefaultDate()
+      params.append('date', eventDate)
 
-      const response = await fetch(`/api/daily-picks`, {
-        method: "GET",
+      const response = await fetch(`/api/daily-picks?${params.toString()}`, {
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       if (!response.ok) {
-        throw new Error(`Failed to fetch daily picks deviations: ${response.status} ${response.statusText}`)
+        throw new Error(`Failed to fetch daily picks: ${response.status} ${response.statusText}`)
       }
 
-      const data = await response.json();
-
+      const data = await response.json()
 
       // Handle different response formats
       if (Array.isArray(data)) {
         return data
-      } else if (data && typeof data === "object") {
+      } else if (data && typeof data === 'object') {
         return data.matches || data.data || data.results || data.legs || []
       }
 
       return []
     } catch (error) {
-      console.error("Error in getDailyTicket:", error)
+      console.error('Error in getDailyTicket:', error)
       throw error
     }
   }
-
+  
   // Fetch basic matches data with sport parameter (simplified for client-side filtering)
   async getMatches(
     sport?: string,
