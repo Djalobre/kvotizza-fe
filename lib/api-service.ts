@@ -182,6 +182,7 @@ export class ApiService {
 
       const response = await fetch(`/api/daily-picks?${params.toString()}`, {
         method: 'GET',
+        cache: "no-store",
         headers: {
           'Content-Type': 'application/json',
         },
