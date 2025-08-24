@@ -16,6 +16,9 @@ export default async function middleware(req: NextRequest) {
 
   // not signed in
   if (!token) {
+    if (req.nextUrl.pathname.startsWith("/admin")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const signInUrl = new URL("/api/auth/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(signInUrl);
@@ -24,8 +27,8 @@ export default async function middleware(req: NextRequest) {
   // role check
   const role = (token as any).role ?? "user";
   if (role !== "admin") {
-    if (req.nextUrl.pathname.startsWith("/api")) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (req.nextUrl.pathname.startsWith('/admin')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     return NextResponse.redirect(new URL("/", req.url));
   }
