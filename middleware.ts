@@ -6,8 +6,6 @@ import { getToken } from "next-auth/jwt";
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/api/top-matches",
-    "/api/top-matches/:path*",
   ],
 };
 
