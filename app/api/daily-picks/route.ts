@@ -1,30 +1,30 @@
 import { NextResponse } from 'next/server'
-import type { DailyTicket, DailyTicketLeg, MarketDeviation } from '../../../types/bookies'
+import type { DailyTicketLeg } from '../../../types/bookies'
 import { API_CONFIG, apiRequest } from '../../../lib/api-config'
 import { sportsConfigService } from '../../../lib/sports-config'
+
+// 🔴 disables ISR/Next cache
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET(request: Request) {
   try {
     // Build query parameters for your API
     const apiConfig = sportsConfigService.getApiConfig()
     const queryParams = new URLSearchParams()
-    // Add sport parameter
-    // Add date span parameter using the API value from config
 
-    // Construct the API URL with query parameters
     const apiUrl = `${API_CONFIG.baseUrl}${apiConfig.endpoints.daily_picks}${
       queryParams.toString() ? `?${queryParams.toString()}` : ''
     }`
 
     console.log(`Fetching daily picks from API: ${apiUrl}`)
-    // Call your real API
-    const response = await apiRequest(apiUrl)
+
+    // Call your real API, disable fetch cache as well
+    const response = await apiRequest(apiUrl, { cache: 'no-store' })
     const data = await response.json()
 
-    // Transform your API response using sport-specific configuration
+    // Transform your API response
     let dailyPicks: any[] = []
-
-    // Handle different API response formats
     if (Array.isArray(data)) {
       dailyPicks = data
     } else if (data && typeof data === 'object') {
@@ -32,17 +32,29 @@ export async function GET(request: Request) {
     }
     const dailyPicksData: DailyTicketLeg[] = dailyPicks
 
-    // Return simple array for client-side filtering and pagination
-    return NextResponse.json(dailyPicksData)
+    // 🚫 Return with no-cache headers
+    return NextResponse.json(dailyPicksData, {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0, must-revalidate',
+        'CDN-Cache-Control': 'no-store',
+        'Cloudflare-CDN-Cache-Control': 'no-store',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    })
   } catch (error) {
-    console.error('Error fetching categories from real API:', error)
-
+    console.error('Error fetching daily picks from real API:', error)
     return NextResponse.json(
       {
-        error: 'Failed to fetch categories',
+        error: 'Failed to fetch daily picks',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0, must-revalidate',
+        },
+      }
     )
   }
 }
