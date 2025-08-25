@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { bookiesData } from '../../lib/data'
 import type {
   BookiesData,
   Match,
@@ -36,6 +37,7 @@ import { DailyTicket } from '@/components/daily-ticket'
 import { MatchCarousel } from '@/components/match-carousel'
 import { get } from 'http'
 import { BetOfTheDay } from '@/components/bet-of-the-day'
+import { LandingNavbar } from '@/components/landing-navbar'
 
 const blogPosts = [
   {
@@ -116,20 +118,22 @@ function best1X2ForMatch(match: Match) {
 }
 
 export default function Landing() {
+  const best = findBestOddOfDay(bookiesData)
   const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
   const [allMarketDeviations, setMarketDeviations] = useState<MarketDeviation[]>([]) // Store all matches from API
   const [allTopMatches, setTopMatches] = useState<TopMatches[]>([]) // Store all matches from API
-
+  const [isDark, setIsDark] = useState(false)
   const [dailyTicket, setDailyTicket] = useState<DailyTicketLeg[]>([]) // Store all matches from API
   const [analysisModalOpen, setAnalysisModalOpen] = useState<boolean>(false)
   const [analysisSelections, setAnalysisSelections] = useState<BetTypeSelection[]>([])
   const [analysisStake, setAnalysisStake] = useState<number>(200)
+
   const getTodayDate = (): string => {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-      const day = String(today.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`; // Returns date in YYYY-MM-DD format
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed
+    const day = String(today.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}` // Returns date in YYYY-MM-DD format
   }
   const fetchMarketDeviations = async () => {
     const data = await apiService.getMarketDeviations(selectedSport)
@@ -167,13 +171,23 @@ export default function Landing() {
     setMarketDeviations(market_deviations)
   }
 
+  const handleThemeToggle = () => {
+    setIsDark(!isDark)
+  }
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDark])
   useEffect(() => {
     fetchMarketDeviations()
   }, [selectedSport])
 
   const fetchTopMatches = async () => {
     const data = await apiService.getTopMatches(getTodayDate())
-
     let top_matches: TopMatches[] = []
     if (Array.isArray(data)) {
       // API returns array directly: [{match1}, {match2}, ...]
@@ -195,7 +209,7 @@ export default function Landing() {
 
   const fetchDailyTicket = async () => {
     const data = await apiService.getDailyPicks(getTodayDate())
-    console.log(data, 'This is daily ticket data')
+
     let daily_ticket: DailyTicketLeg[] = []
     if (Array.isArray(data)) {
       // API returns array directly: [{match1}, {match2}, ...]
@@ -241,7 +255,7 @@ export default function Landing() {
   const topMatches = allTopMatches
 
   const onCTA = useCallback(() => {
-    window.location.href = '/kvote?sport=fudbal&datespan=danas'
+    window.location.href = '/kvote?sport=fudbal&datespan=sve'
   }, [])
 
   const onOpenTickets = useCallback(() => {
@@ -287,46 +301,19 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background dark:bg-kvotizza-dark-bg-10">
+      <LandingNavbar isDark={isDark} onThemeToggle={handleThemeToggle} />
+
       <section className="border-b dark:border-white/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16">
           {/* Hero Content */}
           <div className="space-y-6 mb-8 md:mb-12">
-            {/* Kvotizza Branding */}
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Image
-                  src="/images/kvotizza-logo.png"
-                  alt="Kvotizza Logo"
-                  width={200}
-                  height={200}
-                  className="block dark:hidden h-20 w-auto"
-                />
-                <Image
-                  src="/images/kvotizza-logo-white.png"
-                  alt="Kvotizza Logo"
-                  width={200}
-                  height={200}
-                  className="h-20 w-auto hidden dark:block"
-                />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-kvotizza-green-500">Kvotizza</h2>
-                <p className="text-sm text-muted-foreground">Pametno poređenje kvota</p>
-              </div>
-            </div>
-
-            <Badge className="w-fit bg-sport-blue-500 hover:bg-sport-blue-500 dark:text-white">
-              Kvote u realnom vremenu • Mnogi licencirani operateri
-            </Badge>
-
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-              Uporedi kvote svih kladionica u Srbiji u
-              <span className="text-sport-green-600"> realnom vremenu</span>
+              Najbolja kvota –<span className="text-sport-green-600"> uvek na dohvat ruke.</span>
             </h1>
 
             <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl">
-              <span className="font-semibold text-sport-blue-500">Kvotizza</span> ti pomaže da
-              pronađeš najbolju kvotu, izgradiš optimalan tiket i povećaš eventualni dobitak.
+              <span className="font-semibold text-sport-blue-500">Kvotizza</span> prati sve
+              kladionice u Srbiji i odmah ti pokazuje gde je najisplativije da odigraš tiket.
             </p>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -368,10 +355,7 @@ export default function Landing() {
           <h2 className="text-2xl font-semibold mb-4">Brzi linkovi</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {/* {['Fudbal', 'Engleska 1', 'Italija 1', 'Španija 1', 'Srbija 1', 'Nemačka 1'].map( */}
-            <button key={'Fudbal'} onClick={(e) => {
-                e.stopPropagation()
-                navigateToQuickHub('sport=fudbal')
-              }}>
+            <button key={'Fudbal'} onClick={() => alert(`Preview`)}>
               <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Fudbal</CardContent>
               </Card>
@@ -437,9 +421,7 @@ export default function Landing() {
 
       <section className="py-10 md:py-14 border-y dark:border-white/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
-          <h2 className="text-2xl font-semibold flex items-center gap-2">
-            Top mečevi danas
-          </h2>
+          <h2 className="text-2xl font-semibold flex items-center gap-2">Top mečevi danas</h2>
           <MatchCarousel matches={allTopMatches} />
         </div>
       </section>
