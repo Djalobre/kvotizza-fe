@@ -193,7 +193,7 @@ export default function MatchPage() {
                 variant="ghost"
                 size="sm"
                 className="col-span-1 text-green-100 hover:text-white hover:bg-white/20 border border-white/30 whitespace-normal md:whitespace-nowrap"
-                onClick={goBack}
+                onClick={navigateToKvote()}
               >
                 <ArrowLeft className="h-4 w-4" />
                 {formatMatchLabel(match.start_time)}
