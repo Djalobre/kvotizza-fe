@@ -435,7 +435,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="py-10 md:py-14">
+      <section className="py-10 md:py-14 border-y dark:border-white/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
           <h2 className="text-2xl font-semibold flex items-center gap-2">
             Top mečevi danas
