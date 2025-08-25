@@ -22,6 +22,12 @@ const getOddsValue = (bookie: Bookie, category: string, type: string): number | 
   return odd ? odd.value : null
 }
 
+  const navigateToKvote = () => {
+    // For Next.js App Router
+    if (typeof window !== 'undefined') {
+      window.location.href = `/kvote`
+    }
+  }
 const getTrendsValue = (bookie: Bookie, category: string, type: string): string | null => {
   const cat = bookie.categories.find((c) => c.category === category)
   if (!cat) return null
@@ -134,14 +140,6 @@ export default function MatchPage() {
   }
 
 
-  const goBack = () => {
-    router.push(`/?sport=${sport}&dateSpan=${dateSpan}`)
-  }
-
-  const handleClose = () => {
-    router.push("/")
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -160,7 +158,7 @@ export default function MatchPage() {
           <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
           <h2 className="text-xl font-semibold">Failed to Load Match</h2>
           <p className="text-muted-foreground">{error || "Match not found"}</p>
-          <Button onClick={goBack} className="mt-4">
+          <Button onClick={navigateToKvote()} className="mt-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
           </Button>
