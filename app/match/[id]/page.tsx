@@ -158,7 +158,7 @@ export default function MatchPage() {
           <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
           <h2 className="text-xl font-semibold">Failed to Load Match</h2>
           <p className="text-muted-foreground">{error || "Match not found"}</p>
-          <Button onClick={navigateToKvote()} className="mt-4">
+          <Button onClick={navigateToKvote} className="mt-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
           </Button>
@@ -193,7 +193,7 @@ export default function MatchPage() {
                 variant="ghost"
                 size="sm"
                 className="col-span-1 text-green-100 hover:text-white hover:bg-white/20 border border-white/30 whitespace-normal md:whitespace-nowrap"
-                onClick={navigateToKvote()}
+                onClick={navigateToKvote}
               >
                 <ArrowLeft className="h-4 w-4" />
                 {formatMatchLabel(match.start_time)}
