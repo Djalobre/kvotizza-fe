@@ -365,7 +365,7 @@ export default function Landing() {
 
       <section className="py-10 md:py-12 border-y dark:border-white/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h3 className="text-xl font-semibold mb-4">Brzi hubovi</h3>
+          <h2 className="text-2xl font-semibold mb-4">Brzi linkovi</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {/* {['Fudbal', 'Engleska 1', 'Italija 1', 'Španija 1', 'Srbija 1', 'Nemačka 1'].map( */}
             <button key={'Fudbal'} onClick={(e) => {
@@ -437,10 +437,9 @@ export default function Landing() {
 
       <section className="py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
-          <h3 className="text-xl font-semibold flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-sport-blue-600" />
+          <h2 className="text-2xl font-semibold flex items-center gap-2">
             Top mečevi danas
-          </h3>
+          </h2>
           <MatchCarousel matches={allTopMatches} />
         </div>
       </section>
