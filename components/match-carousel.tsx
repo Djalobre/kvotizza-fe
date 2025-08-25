@@ -24,7 +24,7 @@ const navigateToMatch = (matchId: number) => {
     }
   }
 function best1X2ForMatch(match: TopMatches): MatchOutcome[] {
-  const outcomes = ["Konačan ishod 1", "Konačan ishod 2", "Konačan ishod X"] as const
+  const outcomes = ['Konačan ishod 1', 'Konačan ishod X', 'Konačan ishod 2'] as const
   return outcomes.map((t) => {
     const best = match.bets?.[t]?.bestOdds || 0;
     const bestBookie: string | null = match.bets?.[t]?.bestBookie || null;
