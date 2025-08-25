@@ -50,7 +50,10 @@ export function BetSidebar({ isOpen, onToggle, onAnalyzeBet, page }: BetSidebarP
     setStakeInput(String(n).replace(/^0+(?=\d)/, "")); // drop leading zeros
     // For 2 decimals instead, use: setStakeInput(n.toFixed(2));
   }
-  const className = page === "main" ? "fixed z-[100] dark:bg-kvotizza-green-500 dark:text-white shadow-lg bg-kvotizza-green-500 hover:bg-kvotizza-green-600 backdrop-blur-none top-4 right-0 sm:top-6 sm:right-0 md:top-8 md:right-0" : "dark:bg-kvotizza-green-500 dark:text-white fixed z-[100] shadow-lg bg-white hover:bg-muted text-kvotizza-500 backdrop-blur-none top-4 right-0 sm:top-6 sm:right-0 md:top-8 md:right-0";
+  const className =
+    page === 'main'
+      ? 'fixed z-[100] dark:bg-kvotizza-green-500 dark:text-white shadow-lg bg-kvotizza-green-500 hover:bg-kvotizza-green-600 backdrop-blur-none top-5 right-0 sm:top-6 sm:right-0 md:top-6 md:right-0'
+      : 'dark:bg-kvotizza-green-500 dark:text-white fixed z-[100] shadow-lg bg-white hover:bg-muted text-kvotizza-500 backdrop-blur-none top-5 right-0 sm:top-6 sm:right-0 md:top-6 md:right-0'
 
   useEffect(() => {
     // Load selections from localStorage
