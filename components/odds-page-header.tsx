@@ -24,7 +24,7 @@ export function OddsPageHeader({
   onBackToHome = () => (window.location.href = '/'),
 }: OddsPageHeaderProps) {
   return (
-    <div className="bg-slate-800 text-white sticky top-0 z-50 bg-background/60 dark:bg-kvotizza-dark-bg-10 border-b border-black/10 dark:border-white/10">
+    <div className="text-white sticky top-0 z-50 bg-background/60 dark:bg-kvotizza-dark-bg-10 border-b border-black/10 dark:border-white/10">
       {/* Main Header */}
       <header className="px-4 py-4">
         <div className="flex items-center justify-between">
