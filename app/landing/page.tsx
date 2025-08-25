@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { bookiesData } from '../../lib/data'
 import type {
   BookiesData,
   Match,
@@ -118,16 +117,15 @@ function best1X2ForMatch(match: Match) {
 }
 
 export default function Landing() {
-  const best = findBestOddOfDay(bookiesData)
   const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
   const [allMarketDeviations, setMarketDeviations] = useState<MarketDeviation[]>([]) // Store all matches from API
   const [allTopMatches, setTopMatches] = useState<TopMatches[]>([]) // Store all matches from API
   const [isDark, setIsDark] = useState(false)
+
   const [dailyTicket, setDailyTicket] = useState<DailyTicketLeg[]>([]) // Store all matches from API
   const [analysisModalOpen, setAnalysisModalOpen] = useState<boolean>(false)
   const [analysisSelections, setAnalysisSelections] = useState<BetTypeSelection[]>([])
   const [analysisStake, setAnalysisStake] = useState<number>(200)
-
   const getTodayDate = (): string => {
     const today = new Date()
     const year = today.getFullYear()
@@ -135,6 +133,18 @@ export default function Landing() {
     const day = String(today.getDate()).padStart(2, '0')
     return `${year}-${month}-${day}` // Returns date in YYYY-MM-DD format
   }
+
+  const handleThemeToggle = () => {
+    setIsDark(!isDark)
+  }
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDark])
   const fetchMarketDeviations = async () => {
     const data = await apiService.getMarketDeviations(selectedSport)
 
@@ -171,23 +181,13 @@ export default function Landing() {
     setMarketDeviations(market_deviations)
   }
 
-  const handleThemeToggle = () => {
-    setIsDark(!isDark)
-  }
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [isDark])
   useEffect(() => {
     fetchMarketDeviations()
   }, [selectedSport])
 
   const fetchTopMatches = async () => {
     const data = await apiService.getTopMatches(getTodayDate())
+
     let top_matches: TopMatches[] = []
     if (Array.isArray(data)) {
       // API returns array directly: [{match1}, {match2}, ...]
@@ -209,7 +209,7 @@ export default function Landing() {
 
   const fetchDailyTicket = async () => {
     const data = await apiService.getDailyPicks(getTodayDate())
-
+    console.log(data, 'This is daily ticket data')
     let daily_ticket: DailyTicketLeg[] = []
     if (Array.isArray(data)) {
       // API returns array directly: [{match1}, {match2}, ...]
@@ -255,7 +255,7 @@ export default function Landing() {
   const topMatches = allTopMatches
 
   const onCTA = useCallback(() => {
-    window.location.href = '/kvote?sport=fudbal&datespan=sve'
+    window.location.href = '/kvote?sport=fudbal&datespan=danas'
   }, [])
 
   const onOpenTickets = useCallback(() => {
@@ -355,7 +355,13 @@ export default function Landing() {
           <h2 className="text-2xl font-semibold mb-4">Brzi linkovi</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {/* {['Fudbal', 'Engleska 1', 'Italija 1', 'Španija 1', 'Srbija 1', 'Nemačka 1'].map( */}
-            <button key={'Fudbal'} onClick={() => alert(`Preview`)}>
+            <button
+              key={'Fudbal'}
+              onClick={(e) => {
+                e.stopPropagation()
+                navigateToQuickHub('sport=fudbal')
+              }}
+            >
               <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
                 <CardContent className="p-4 text-center font-medium">Fudbal</CardContent>
               </Card>
