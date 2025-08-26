@@ -1239,8 +1239,13 @@ export default function Component({}: BookiesTableProps) {
                                   className="font-bold text-lg bg-kvotizza-blue-500 dark:bg-dark-theme-kvotizza-blue-20 text-white"
                                 >
                                   <div className="flex items-center gap-2 text-sm">
-                                    <Trophy className="h-4 w-4 text-white" />
-                                    {groupHeaderText}
+                                    <Image
+                                      src={`/flags/${match.country_name.toLowerCase()}.png`}
+                                      alt="Bookie"
+                                      width={15}
+                                      height={15}
+                                      className="block hidden sm:block"
+                                    />                                    {groupHeaderText}
                                   </div>
                                 </TableCellExpanded>
                               </TableRow>
