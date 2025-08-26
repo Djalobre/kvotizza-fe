@@ -17,7 +17,7 @@ export function LandingNavbar({ isDark = false, onThemeToggle }: LandingNavbarPr
   const navItems = [
     { label: 'Kvote', href: '/kvote', icon: Trophy },
     // { label: 'Analize', href: '/analize', icon: BarChart3 },
-    { label: 'Blog', href: '/blog', icon: Newspaper },
+    // { label: 'Blog', href: '/blog', icon: Newspaper },
     { label: 'Kontakt', href: '/kontakt', icon: HelpCircle },
   ]
 
