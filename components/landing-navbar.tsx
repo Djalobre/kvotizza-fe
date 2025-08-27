@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Moon, Sun, Menu, X, Trophy, BarChart3, Newspaper, HelpCircle } from 'lucide-react'
+import { Moon, Sun, Menu, X, Trophy, BarChart3, Newspaper, HelpCircle, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image' // Ensure Image is imported from next/image
@@ -14,11 +14,12 @@ interface LandingNavbarProps {
 
 export function LandingNavbar({ isDark = false, onThemeToggle }: LandingNavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
+  
   const navItems = [
+    { label: 'Početna', href: '/', icon: Home },
     { label: 'Kvote', href: '/kvote', icon: Trophy },
     // { label: 'Analize', href: '/analize', icon: BarChart3 },
-    { label: 'Blog', href: '/blog', icon: Newspaper },
+    // { label: 'Blog', href: '/blog', icon: Newspaper },
     { label: 'Kontakt', href: '/kontakt', icon: HelpCircle },
   ]
 
