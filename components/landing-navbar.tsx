@@ -5,6 +5,7 @@ import { Moon, Sun, Menu, X, Trophy, BarChart3, Newspaper, HelpCircle } from 'lu
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image' // Ensure Image is imported from next/image
+import { ThemeToggle } from './theme-toggle'
 
 interface LandingNavbarProps {
   isDark?: boolean
@@ -17,7 +18,7 @@ export function LandingNavbar({ isDark = false, onThemeToggle }: LandingNavbarPr
   const navItems = [
     { label: 'Kvote', href: '/kvote', icon: Trophy },
     // { label: 'Analize', href: '/analize', icon: BarChart3 },
-    // { label: 'Blog', href: '/blog', icon: Newspaper },
+    { label: 'Blog', href: '/blog', icon: Newspaper },
     { label: 'Kontakt', href: '/kontakt', icon: HelpCircle },
   ]
 
@@ -62,15 +63,7 @@ export function LandingNavbar({ isDark = false, onThemeToggle }: LandingNavbarPr
           {/* Right Side Actions */}
           <div className="flex  gap-3 justify-self-end">
             {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onThemeToggle}
-              className="h-9 w-9 p-0"
-              title={isDark ? 'Prebaci na svetlu temu' : 'Prebaci na tamnu temu'}
-            >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
+            <ThemeToggle />
 
             {/* Mobile Menu Toggle */}
             <Button
