@@ -1,32 +1,26 @@
-// app/layout.tsx
-import type { Metadata } from "next";
-import "./globals.css";
-import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
+import type React from 'react'
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { ThemeProvider } from '@/contexts/theme-context'
+import { ThemeScript } from '@/components/theme-script'
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "Kvotizza",
-  description: "Uporedi kvote za sportsko klađenje",
-  icons: {
-  icon: "/logo.png", // or .png if you use PNG
-  },
-};
+  title: 'Kvotizza - Pametno poređenje kvota',
+  description: 'Uporedi kvote svih kladionica u Srbiji u realnom vremenu',
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="sr" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
