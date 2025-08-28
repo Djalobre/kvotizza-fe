@@ -307,16 +307,16 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16">
           {/* Hero Content */}
           <div className="space-y-6 mb-8 md:mb-12">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-center">
               Najbolja kvota –<span className="text-sport-green-600"> uvek na dohvat ruke.</span>
             </h1>
 
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl">
-              <span className="font-semibold text-sport-blue-500">Kvotizza</span> prati sve
+            <p className="mx-auto text-lg text-muted-foreground leading-relaxed max-w-3xl text-center">
+              <span className="font-semibold text-sport-blue-500 ">Kvotizza</span> prati sve
               kladionice u Srbiji i odmah ti pokazuje gde je najisplativije da odigraš tiket.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3 justify-center">
               <Button
                 size="lg"
                 className="bg-sport-green-600 hover:bg-kvotizza-green-500 text-white font-semibold"
@@ -329,7 +329,7 @@ export default function Landing() {
             </div>
 
             {/* Trust indicators */}
-            <div className="flex items-center gap-6 pt-4 border-t border-muted">
+            <div className="flex items-center justify-center gap-6 pt-4 border-t border-muted">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <ShieldAlert className="h-4 w-4 text-kvotizza-green-400" />
                 <span>Licencirane kladionice</span>
