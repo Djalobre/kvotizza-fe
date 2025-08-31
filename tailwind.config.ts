@@ -57,6 +57,8 @@ const config = {
         'kvotizza-dark-bg': {
           10: '#1d2631',
           20: '#2C3A4B',
+          30: '#2b3b5c',
+
         },
         'kvotizza-dark-theme-red': {
           10: '#fc9088',
