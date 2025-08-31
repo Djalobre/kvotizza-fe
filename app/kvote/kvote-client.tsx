@@ -1236,7 +1236,7 @@ export default function Component({}: BookiesTableProps) {
                               <TableRow className="sticky top-[39px] z-10 bg-kvotizza-blue-500 dark:bg-dark-theme-kvotizza-blue-20 border-b shadow-sm bg-background ">
                                 <TableCellExpanded
                                   colSpan={colSpan}
-                                  className="font-bold text-lg bg-kvotizza-blue-500 dark:bg-dark-theme-kvotizza-blue-20 text-white"
+                                  className="font-bold text-lg bg-kvotizza-blue-500 dark:bg-kvotizza-dark-bg-30 text-white"
                                 >
                                   <div className="flex items-center gap-2 text-sm">
                                     <Image
