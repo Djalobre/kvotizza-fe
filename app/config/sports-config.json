@@ -114,7 +114,10 @@
       "market_deviations": "/market-deviations",
       "daily_picks": "/daily-picks",
       "matchup_events": "/matchup-events",
-      "top_matches": "/top-matches"
+      "top_matches": "/top-matches",
+      "daily_picks_candidates": "/admin/daily-picks/candidates",
+      "daily_picks_filters": "/admin/daily-picks/filters",
+      "daily_picks_save": "/admin/daily-picks"
     },
     "queryParams": {
       "sport": "sport",
