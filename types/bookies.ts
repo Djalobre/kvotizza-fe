@@ -15,30 +15,30 @@ export interface Bookie {
 }
 
 export interface Categories {
-  categories: string[];
+  categories: string[]
 }
 
 export interface MarketDeviation {
-  home_team: string,
-  away_team: string,
-  competition_name: string,
-  bet_name: string,
-  odd: number,
-  start_time: string,
-  bookie: string,
-  match_id: number,
-  country_name: string,
-  sport_name: string,
-  avg_odd: number,
+  home_team: string
+  away_team: string
+  competition_name: string
+  bet_name: string
+  odd: number
+  start_time: string
+  bookie: string
+  match_id: number
+  country_name: string
+  sport_name: string
+  avg_odd: number
   odstupanje: number
 }
 export interface BetItem {
-  key: string;            // e.g. "konacanIshod1"
-  bestOdds: number;
-  bestBookie: string;
+  key: string // e.g. "konacanIshod1"
+  bestOdds: number
+  bestBookie: string
 }
 
-export type BetsMap = Record<string, BetItem>;
+export type BetsMap = Record<string, BetItem>
 
 export interface MatchCarouselProps {
   matches: TopMatches[]
@@ -51,14 +51,50 @@ export interface MatchOutcome {
   bookie: string | null
 }
 
+export type Market = {
+  bet_category: string
+  bet_name: string
+  odd: number
+  bookie: string
+  avg_other?: number | null
+  market_diff_pct?: number | null
+}
+
+export type MatchCand = {
+  match_id: number
+  home_team: string
+  away_team: string
+  competition_name: string
+  sport_name: string
+  country_name: string
+  start_time: string
+  markets: Market[]
+}
+
+export type Leg = {
+  odd: number
+  bookie: string
+  bet_name: string
+  match_id: number
+  avg_other?: number | null
+  away_team: string
+  home_team: string
+  sport_name: string
+  start_time: string
+  bet_category: string
+  country_name: string
+  market_diff_pct?: number | null
+  competition_name: string
+}
+
 export interface TopMatches {
-  id: number;
-  bets: BetsMap;
-  sport: string;
-  league: string;
-  country: string;
-  matchup: string;
-  start_time: string;     // ISO 8601 string
+  id: number
+  bets: BetsMap
+  sport: string
+  league: string
+  country: string
+  matchup: string
+  start_time: string // ISO 8601 string
 }
 // Basic match data for the main table
 export interface BasicMatch {
@@ -85,8 +121,6 @@ export interface DetailedMatch {
   bookies: Bookie[]
 }
 
-
-
 export interface BetTypeSelection {
   matchId: number
   matchup: string
@@ -97,33 +131,32 @@ export interface BetTypeSelection {
   bookie?: string
 }
 export type DailyTicket = {
-  id: number,
-  pick_date: string,
-  created_at: string,
-  legs: DailyTicketLeg[],
-  total_odds: number,
-  expires_at: string,
-  algo_version:string,
-  is_manual: boolean,
-  published_by: string,
-  published_at:string,
-  notes: string | null,
+  id: number
+  pick_date: string
+  created_at: string
+  legs: DailyTicketLeg[]
+  total_odds: number
+  expires_at: string
+  algo_version: string
+  is_manual: boolean
+  published_by: string
+  published_at: string
+  notes: string | null
 }
 
-
 export type DailyTicketLeg = {
-  match_id: number | string;
-  odd?: number | string | null;
-  bookie?: string | null;
-  country_name: string;
-  bet_name: string;
-  away_team: string;
-  home_team: string;
-  sport_name?: string;
-  start_time?: string;
-  bet_category: string;
-  competition_name: string;
-};
+  match_id: number | string
+  odd?: number | string | null
+  bookie?: string | null
+  country_name: string
+  bet_name: string
+  away_team: string
+  home_team: string
+  sport_name?: string
+  start_time?: string
+  bet_category: string
+  competition_name: string
+}
 
 export interface BookieOddsComparison {
   bookie: string
@@ -146,7 +179,6 @@ export interface BookieSummary {
   missingSelections: BetTypeSelection[]
   allAvailable: boolean
 }
-
 
 export interface BetSelection {
   id: string
@@ -177,7 +209,7 @@ export interface Match {
   tips: Tip[]
   bookies: Bookie[]
   startTime: string // ISO UTC kickoff time
-  status: "scheduled" | "live" | "finished" | "postponed"
+  status: 'scheduled' | 'live' | 'finished' | 'postponed'
 }
 
 export type BookiesData = Match[]
@@ -191,7 +223,7 @@ export interface BonusThreshold {
 export interface ConditionalBonusThreshold extends BonusThreshold {
   excludeCategories?: string[]
   includeCategories?: string[]
-  condition?: "exclude" | "include"
+  condition?: 'exclude' | 'include'
   alternativePercentage?: number
   conditionDescription?: string
 }
@@ -214,7 +246,6 @@ export interface BonusCalculation {
   conditionDescription?: string
 }
 
-
 // New type for best odd of day result
 export interface BestOddResult {
   matchId: number
@@ -227,8 +258,6 @@ export interface BestOddResult {
   marketAvg: number
   improvementPct: number
 }
-
-
 
 // New type for daily ticket result
 export interface DailyTicketResult {
