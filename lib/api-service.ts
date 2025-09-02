@@ -93,7 +93,7 @@ export class ApiService {
     }
   }
 
-  async getMatchupEvents(sport?: string, date?: string, league?: string): Promise<BasicMatch[]> {
+  async getMatchupEvents(sport: string, date: string, leagues: string[]): Promise<BasicMatch[]> {
     try {
       const params = new URLSearchParams()
 
@@ -102,12 +102,16 @@ export class ApiService {
         params.append('sport', sport)
       }
 
+      if (leagues.length > 1) {
+        leagues.forEach((league) => params.append('leagues', league))
+      } else if (leagues.length === 1) {
+        params.append('leagues', leagues[0])
+      }
       // Always add dateSpan parameter - use default if not provided
       const eventDate = date || sportsConfigService.getDefaultDate()
       params.append('date', eventDate)
 
       // Add other optional parameters
-      if (league) params.append('league', league)
       const response = await fetch(`/api/matchup-events?${params.toString()}`, {
         method: 'GET',
         headers: {
