@@ -1,60 +1,51 @@
+// app/api/top-matches/route.ts
 import { NextResponse } from 'next/server'
-import type { DailyTicketLeg } from '../../../types/bookies'
-import { API_CONFIG, apiRequest } from '../../../lib/api-config'
-import { sportsConfigService } from '../../../lib/sports-config'
+import { API_CONFIG, apiRequest, getApiHeaders } from '@/lib/api-config'
+import { sportsConfigService } from '@/lib/sports-config'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
-// 🔴 disables ISR/Next cache
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   try {
-    // Build query parameters for your API
-    const apiConfig = sportsConfigService.getApiConfig()
-    const queryParams = new URLSearchParams()
-
-    const apiUrl = `${API_CONFIG.baseUrl}${apiConfig.endpoints.daily_picks}${
-      queryParams.toString() ? `?${queryParams.toString()}` : ''
-    }`
-
-    console.log(`Fetching daily picks from API: ${apiUrl}`)
-
-    // Call your real API, disable fetch cache as well
-    const response = await apiRequest(apiUrl, { cache: 'no-store' })
-    const data = await response.json()
-
-    // Transform your API response
-    let dailyPicks: any[] = []
-    if (Array.isArray(data)) {
-      dailyPicks = data
-    } else if (data && typeof data === 'object') {
-      dailyPicks = data.data || data.results || data.legs || []
+    const session = await getServerSession(authOptions)
+    // Only allow admins
+    if (!session || (session.user as any)?.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const dailyPicksData: DailyTicketLeg[] = dailyPicks
+    const payload = await request.json()
 
-    // 🚫 Return with no-cache headers
-    return NextResponse.json(dailyPicksData, {
+    console.log('Received payload for daily picks:', payload)
+    // Real API endpoint
+    const apiConfig = sportsConfigService.getApiConfig()
+    const dailyPicksEndpoint =
+      (apiConfig?.endpoints as any)?.daily_picks_save ?? '/admin/daily-picks'
+    const apiUrl = `${API_CONFIG.baseUrl}${dailyPicksEndpoint}`
+
+    // Prosledi payload ka real API-ju
+    const resp = await apiRequest(apiUrl, {
+      method: 'POST',
       headers: {
-        'Cache-Control': 'no-store, max-age=0, must-revalidate',
-        'CDN-Cache-Control': 'no-store',
-        'Cloudflare-CDN-Cache-Control': 'no-store',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        ...getApiHeaders(),
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        pick_date: payload.pick_date,
+        legs: payload.legs,
+        notes: payload.notes,
+      }),
     })
+
+    // Vrati šta god backend vrati (status + body)
+    const body = await resp.json().catch(() => ({}))
+    return NextResponse.json(body, { status: resp.status })
   } catch (error) {
-    console.error('Error fetching daily picks from real API:', error)
+    console.error('Error posting daily ticket to real API:', error)
     return NextResponse.json(
       {
-        error: 'Failed to fetch daily picks',
+        error: 'Failed to save daily ticket matches',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      {
-        status: 500,
-        headers: {
-          'Cache-Control': 'no-store, max-age=0, must-revalidate',
-        },
-      }
+      { status: 500 }
     )
   }
 }
