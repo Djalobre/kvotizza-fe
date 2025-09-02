@@ -1,4 +1,4 @@
-import sportsConfigData from "../app/config/sports-config.json"
+import sportsConfigData from '../app/config/sports-config.json'
 
 export interface QuickMarket {
   key: string
@@ -51,6 +51,9 @@ export interface SportsConfig {
       daily_picks: string
       matchup_events: string
       top_matches: string
+      daily_picks_candidates: string
+      daily_picks_filters: string
+      daily_picks_save: string
     }
     queryParams: {
       [key: string]: string
@@ -92,22 +95,21 @@ class SportsConfigService {
     return this.config.sports[sport] || null
   }
 
-
   getDefaultMarketGroup(): string {
-    return this.config.defaultMarketGroup || "konacanIshod"
+    return this.config.defaultMarketGroup || 'konacanIshod'
   }
 
-    // Get quick markets for a sport
-    getFEQuickMarkets(sport: string, category: string): QuickMarket[] {
-      const sportConfig = this.getSportConfig(sport)
-      const data = sportConfig?.quickMarkets?.filter((market) => market.category === category) || []
-      return data|| []
-    }
-  
+  // Get quick markets for a sport
+  getFEQuickMarkets(sport: string, category: string): QuickMarket[] {
+    const sportConfig = this.getSportConfig(sport)
+    const data = sportConfig?.quickMarkets?.filter((market) => market.category === category) || []
+    return data || []
+  }
+
   // Get quick markets for a sport
   getQuickMarkets(sport: string): QuickMarket[] {
     const sportConfig = this.getSportConfig(sport)
-    return sportConfig?.quickMarkets|| []
+    return sportConfig?.quickMarkets || []
   }
 
   // Get field mappings for a sport
@@ -121,18 +123,17 @@ class SportsConfigService {
     return this.config.defaultSport
   }
 
-  getDefaultCompetition():string {
-    return this.config.defaultCompetition  || "Engleska 1"
+  getDefaultCompetition(): string {
+    return this.config.defaultCompetition || 'Engleska 1'
   }
   getTodayDate(): string {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0') // Months are zero-based
+    const day = String(today.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
-  getDefaultDate():string {
-    
+  getDefaultDate(): string {
     return this.config.defaultDate || this.getTodayDate()
   }
 
@@ -146,9 +147,9 @@ class SportsConfigService {
     for (const path of paths) {
       try {
         // Handle special case for concatenated fields like "homeTeam|vs|awayTeam"
-        if (path.includes("|")) {
-          const parts = path.split("|")
-          if (parts.length === 3 && parts[1] === "vs") {
+        if (path.includes('|')) {
+          const parts = path.split('|')
+          if (parts.length === 3 && parts[1] === 'vs') {
             const homeValue = this.getNestedValue(obj, parts[0])
             const awayValue = this.getNestedValue(obj, parts[2])
             if (homeValue && awayValue) {
@@ -172,7 +173,7 @@ class SportsConfigService {
 
   // Helper to get nested value using dot notation
   private getNestedValue(obj: any, path: string): any {
-    return path.split(".").reduce((current, key) => {
+    return path.split('.').reduce((current, key) => {
       return current && current[key] !== undefined ? current[key] : undefined
     }, obj)
   }
@@ -183,11 +184,11 @@ class SportsConfigService {
     const quickMarkets = this.getQuickMarkets(sport)
 
     const transformed: any = {
-      id: this.extractValue(rawData, fieldMappings.id || ["id"]),
-      matchup: this.extractValue(rawData, fieldMappings.matchup || ["matchup"]),
-      league: this.extractValue(rawData, fieldMappings.league || ["league"]),
-      start_time: this.extractValue(rawData, fieldMappings.start_time || ["start_time"]),
-      country_name: this.extractValue(rawData, fieldMappings.country_name || ["country_name"]),
+      id: this.extractValue(rawData, fieldMappings.id || ['id']),
+      matchup: this.extractValue(rawData, fieldMappings.matchup || ['matchup']),
+      league: this.extractValue(rawData, fieldMappings.league || ['league']),
+      start_time: this.extractValue(rawData, fieldMappings.start_time || ['start_time']),
+      country_name: this.extractValue(rawData, fieldMappings.country_name || ['country_name']),
       quickMarkets: {},
     }
     // Transform quick markets
@@ -197,8 +198,8 @@ class SportsConfigService {
 
       if (odds && bookie) {
         transformed.quickMarkets[market.key] = {
-          bestOdds: typeof odds === "object" ? odds.odds || odds.value : odds,
-          bestBookie: typeof bookie === "object" ? bookie.name || bookie : bookie,
+          bestOdds: typeof odds === 'object' ? odds.odds || odds.value : odds,
+          bestBookie: typeof bookie === 'object' ? bookie.name || bookie : bookie,
         }
       } else {
         transformed.quickMarkets[market.key] = null
@@ -227,23 +228,27 @@ class SportsConfigService {
     return this.config.dateSpans?.[dateSpan] || null
   }
 
-    // Get configuration for a specific date span
-    getDateConfig(date: string): DateSpan | null {
-      return this.config.dateSpans?.[date] || null
-    }
-  
+  // Get configuration for a specific date span
+  getDateConfig(date: string): DateSpan | null {
+    return this.config.dateSpans?.[date] || null
+  }
+
   // Get default date span
   getDefaultDateSpan(): string {
-    return this.config.defaultDateSpan || "naredna3dana"
+    return this.config.defaultDateSpan || 'naredna3dana'
   }
 
   getDefaultCategory(): string {
-    return this.config.defaultCategory || "Konačan ishod"
+    return this.config.defaultCategory || 'Konačan ishod'
   }
-  
 
   // Get available date spans list for UI
-  getDateSpansList(): Array<{ key: string; displayName: string; description: string; apiValue: string }> {
+  getDateSpansList(): Array<{
+    key: string
+    displayName: string
+    description: string
+    apiValue: string
+  }> {
     return Object.entries(this.config.dateSpans || {}).map(([key, config]) => ({
       key,
       displayName: config.displayName,
