@@ -3,6 +3,9 @@ import type { DailyTicket, DailyTicketLeg, MarketDeviation } from '../../../type
 import { API_CONFIG, apiRequest } from '../../../lib/api-config'
 import { sportsConfigService } from '../../../lib/sports-config'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET(request: Request) {
   try {
     // Build query parameters for your API
@@ -18,9 +21,8 @@ export async function GET(request: Request) {
 
     console.log(`Fetching daily picks from API: ${apiUrl}`)
     // Call your real API
-    console.log(apiUrl, 'APisadidasiiadsiadsiiasiad')
 
-    const response = await apiRequest(apiUrl)
+    const response = await apiRequest(apiUrl, { cache: 'no-store' })
     const data = await response.json()
 
     // Transform your API response using sport-specific configuration
