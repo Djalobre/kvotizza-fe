@@ -1,5 +1,12 @@
-import type { BasicMatch, DailyTicketLeg, DetailedMatch, MarketDeviation, TopMatches } from "../types/bookies"
-import { sportsConfigService } from "../services/sports-config-service" // Declare the variable before using it
+import type {
+  BasicMatch,
+  DailyTicketLeg,
+  DetailedMatch,
+  MarketDeviation,
+  MatchCand,
+  TopMatches,
+} from '../types/bookies'
+import { sportsConfigService } from '../services/sports-config-service' // Declare the variable before using it
 
 // Client-side API service
 export class ApiService {
@@ -14,144 +21,131 @@ export class ApiService {
     return ApiService.instance
   }
 
-  async getMarketDeviations(
-    sport?: string,
-  ): Promise<MarketDeviation[]> {
+  async getMarketDeviations(sport?: string): Promise<MarketDeviation[]> {
     try {
       const params = new URLSearchParams()
 
       // Always add sport parameter
       if (sport) {
-        params.append("sport", sport)
+        params.append('sport', sport)
       }
 
       const response = await fetch(`/api/market-deviations?${params.toString()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       if (!response.ok) {
-        throw new Error(`Failed to fetch market deviations: ${response.status} ${response.statusText}`)
+        throw new Error(
+          `Failed to fetch market deviations: ${response.status} ${response.statusText}`
+        )
       }
 
-      const data = await response.json();
-
+      const data = await response.json()
 
       // Handle different response formats
       if (Array.isArray(data)) {
         return data
-      } else if (data && typeof data === "object") {
+      } else if (data && typeof data === 'object') {
         return data.matches || data.data || data.results || []
       }
 
       return []
     } catch (error) {
-      console.error("Error in getMarketDeviations:", error)
+      console.error('Error in getMarketDeviations:', error)
       throw error
     }
   }
 
-  async getTopMatches(
-    date?: string,
-  ): Promise<TopMatches[]> {
+  async getTopMatches(date?: string): Promise<TopMatches[]> {
     try {
       const params = new URLSearchParams()
       const eventDate = date || sportsConfigService.getDefaultDate()
-      params.append("date", eventDate)
+      params.append('date', eventDate)
       // Always add sport parameter
 
-
       const response = await fetch(`/api/top-matches?${params.toString()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       if (!response.ok) {
-        throw new Error(`Failed to fetch market deviations: ${response.status} ${response.statusText}`)
+        throw new Error(
+          `Failed to fetch market deviations: ${response.status} ${response.statusText}`
+        )
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
-      console.log(data)
       // Handle different response formats
       if (Array.isArray(data)) {
         return data
-      } else if (data && typeof data === "object") {
+      } else if (data && typeof data === 'object') {
         return data.matches || data.data || data.results || []
       }
 
       return []
     } catch (error) {
-      console.error("Error in getMarketDeviations:", error)
+      console.error('Error in getMarketDeviations:', error)
       throw error
     }
   }
-  
-  async getMatchupEvents(
-    sport?: string,
-    date?: string,
-    league?: string
-  ): Promise<BasicMatch[]> {
+
+  async getMatchupEvents(sport?: string, date?: string, league?: string): Promise<BasicMatch[]> {
     try {
       const params = new URLSearchParams()
 
-
       // Always add sport parameter
       if (sport) {
-        params.append("sport", sport)
+        params.append('sport', sport)
       }
 
       // Always add dateSpan parameter - use default if not provided
       const eventDate = date || sportsConfigService.getDefaultDate()
-      params.append("date", eventDate)
+      params.append('date', eventDate)
 
       // Add other optional parameters
-      if (league) params.append("league", league)
+      if (league) params.append('league', league)
       const response = await fetch(`/api/matchup-events?${params.toString()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       if (!response.ok) {
         throw new Error(`Failed to fetch matchup events: ${response.status} ${response.statusText}`)
       }
-      
-      const data = await response.json();
-      console.log(data)
+
+      const data = await response.json()
 
       // Handle different response formats
       if (Array.isArray(data)) {
         return data
-      } else if (data && typeof data === "object") {
+      } else if (data && typeof data === 'object') {
         return data.matches || data.data || data.results || data.legs || []
       }
 
       return []
     } catch (error) {
-      console.error("Error in matchupEvents:", error)
+      console.error('Error in matchupEvents:', error)
       throw error
     }
   }
 
-
-
-  async getCategories(
-    sport?: string,
-  ): Promise<string[]> {
+  async getCategories(sport?: string): Promise<string[]> {
     try {
       const params = new URLSearchParams()
 
       // Always add sport parameter
       if (sport) {
-        params.append("sport", sport)
+        params.append('sport', sport)
       }
       const response = await fetch(`/api/categories?${params.toString()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       if (!response.ok) {
@@ -162,13 +156,13 @@ export class ApiService {
       // Handle different response formats
       if (Array.isArray(data)) {
         return data
-      } else if (data && typeof data === "object") {
+      } else if (data && typeof data === 'object') {
         return data.matches || data.data || data.results || []
       }
 
       return []
     } catch (error) {
-      console.error("Error in getCategories:", error)
+      console.error('Error in getCategories:', error)
       throw error
     }
   }
@@ -182,7 +176,6 @@ export class ApiService {
 
       const response = await fetch(`/api/daily-picks?${params.toString()}`, {
         method: 'GET',
-        cache: "no-store",
         headers: {
           'Content-Type': 'application/json',
         },
@@ -206,7 +199,7 @@ export class ApiService {
       throw error
     }
   }
-  
+
   // Fetch basic matches data with sport parameter (simplified for client-side filtering)
   async getMatches(
     sport?: string,
@@ -214,29 +207,28 @@ export class ApiService {
       dateSpan?: string
       league?: string
       search?: string
-    },
+    }
   ): Promise<BasicMatch[]> {
     try {
       const params = new URLSearchParams()
 
       // Always add sport parameter
       if (sport) {
-        params.append("sport", sport)
+        params.append('sport', sport)
       }
 
       // Always add dateSpan parameter - use default if not provided
       const dateSpan = options?.dateSpan || sportsConfigService.getDefaultDateSpan()
-      params.append("dateSpan", dateSpan)
+      params.append('dateSpan', dateSpan)
 
       // Add other optional parameters
-      if (options?.league) params.append("league", options.league)
-      if (options?.search) params.append("search", options.search)
-
+      if (options?.league) params.append('league', options.league)
+      if (options?.search) params.append('search', options.search)
 
       const response = await fetch(`/api/matches?${params.toString()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
       if (!response.ok) {
@@ -247,38 +239,42 @@ export class ApiService {
       // Handle different response formats
       if (Array.isArray(data)) {
         return data
-      } else if (data && typeof data === "object") {
+      } else if (data && typeof data === 'object') {
         return data.matches || data.data || data.results || []
       }
 
       return []
     } catch (error) {
-      console.error("Error in getMatches:", error)
+      console.error('Error in getMatches:', error)
       throw error
     }
   }
 
   // Fetch detailed match data by ID with sport parameter
-  async getMatchDetails(matchId: number, sport?: string, dateSpan?: string): Promise<DetailedMatch> {
+  async getMatchDetails(
+    matchId: number,
+    sport?: string,
+    dateSpan?: string
+  ): Promise<DetailedMatch> {
     try {
       const params = new URLSearchParams()
-      if (sport) params.append("sport", sport)
-      if (dateSpan) params.append("dateSpan", dateSpan)
+      if (sport) params.append('sport', sport)
+      if (dateSpan) params.append('dateSpan', dateSpan)
 
       const response = await fetch(`/api/matches/${matchId}?${params.toString()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error("Match not found")
+          throw new Error('Match not found')
         }
         throw new Error(`Failed to fetch match details: ${response.status} ${response.statusText}`)
       }
-      
+
       return await response.json()
     } catch (error) {
       console.error(`Error in getMatchDetails for match ${matchId}:`, error)
@@ -287,20 +283,24 @@ export class ApiService {
   }
 
   // Optional: Add methods for filtering matches by various criteria
-  async getMatchesByLeague(league: string, sport?: string, dateSpan?: string): Promise<BasicMatch[]> {
+  async getMatchesByLeague(
+    league: string,
+    sport?: string,
+    dateSpan?: string
+  ): Promise<BasicMatch[]> {
     try {
       const params = new URLSearchParams()
-      params.append("league", league)
-      if (sport) params.append("sport", sport)
-      if (dateSpan) params.append("dateSpan", dateSpan)
+      params.append('league', league)
+      if (sport) params.append('sport', sport)
+      if (dateSpan) params.append('dateSpan', dateSpan)
 
       const response = await fetch(`/api/matches?${params.toString()}`)
-      if (!response.ok) throw new Error("Failed to fetch matches by league")
+      if (!response.ok) throw new Error('Failed to fetch matches by league')
 
       const data = await response.json()
       return Array.isArray(data) ? data : data.matches || data.data || []
     } catch (error) {
-      console.error("Error in getMatchesByLeague:", error)
+      console.error('Error in getMatchesByLeague:', error)
       throw error
     }
   }
@@ -308,30 +308,117 @@ export class ApiService {
   async searchMatches(query: string, sport?: string, dateSpan?: string): Promise<BasicMatch[]> {
     try {
       const params = new URLSearchParams()
-      params.append("search", query)
-      if (sport) params.append("sport", sport)
-      if (dateSpan) params.append("dateSpan", dateSpan)
+      params.append('search', query)
+      if (sport) params.append('sport', sport)
+      if (dateSpan) params.append('dateSpan', dateSpan)
 
       const response = await fetch(`/api/matches?${params.toString()}`)
-      if (!response.ok) throw new Error("Search failed")
+      if (!response.ok) throw new Error('Search failed')
 
       const data = await response.json()
       return Array.isArray(data) ? data : data.matches || data.data || []
     } catch (error) {
-      console.error("Error in searchMatches:", error)
+      console.error('Error in searchMatches:', error)
       throw error
     }
   }
 
-  saveTopMatches = async (body: { pick_date: string; sport: string; created_by: string; matches: any[] }) => {
+  async loadFilters(sport: string, day: string): Promise<any> {
+    try {
+      const params = new URLSearchParams()
+      // Always add sport parameter
+      if (sport) {
+        params.append('sport', sport)
+      }
+
+      if (day) {
+        params.append('day', day)
+      }
+      const res = await fetch(`/api/admin/daily-picks/filters?${params.toString()}`)
+      const data = await res.json()
+      console.log('Filters data:', data)
+
+      return data
+    } catch (error) {
+      console.error('Error in get filters:', error)
+      throw error
+    }
+  }
+
+  async getCandidates(
+    sport: string,
+    day: string,
+    leagues: string[],
+    betCategories: string[]
+  ): Promise<MatchCand[]> {
+    try {
+      const params = new URLSearchParams()
+      // Always add sport parameter
+      if (sport) {
+        params.append('sport', sport)
+      }
+      if (day) {
+        params.append('day', day)
+      }
+      if (leagues.length > 1) {
+        leagues.forEach((league) => params.append('leagues', league))
+      } else if (leagues.length === 1) {
+        params.append('leagues', leagues[0])
+      }
+
+      if (betCategories.length > 1) {
+        betCategories.forEach((betCategory) => params.append('categories', betCategory))
+      } else if (betCategories.length === 1) {
+        params.append('categories', betCategories[0])
+      }
+
+      const res = await fetch(`/api/admin/daily-picks/candidates?${params.toString()}`)
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        return data
+      } else if (data && typeof data === 'object') {
+        return data.matches || data.data || data.results || []
+      }
+
+      return []
+    } catch (error) {
+      console.error('Error in get candidates:', error)
+      throw error
+    }
+  }
+
+  saveTopMatches = async (body: {
+    pick_date: string
+    sport: string
+    created_by: string
+    matches: any[]
+  }) => {
     await fetch(`/api/top-matches`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    });
+    })
+  }
 
-}
-
+  saveTicket = async (body: { pick_date: string; legs: any[]; notes: string }) => {
+    const res = await fetch('/api/admin/daily-picks/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pick_date: body.pick_date,
+        legs: body.legs,
+        notes: body.notes,
+      }),
+    })
+    console.log(JSON.stringify({ body }), 'this is respooonsee')
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}))
+      alert(`Save failed: ${j.detail || res.statusText}`)
+      return
+    }
+    const j = await res.json()
+    alert(`Saved daily ticket id=${j.id}, total_odds=${j.total_odds.toFixed(2)}`)
+  }
 }
 
 // Export singleton instance
