@@ -134,7 +134,7 @@ export function DailyTicket({
                     {b.bookie}
                   </a>
                   <Image
-                    src={`/images/${b.bookie}.png`}
+                    src={`/images/${b.bookie ? b.bookie.toLowerCase() : 'default'}.png`}
                     alt={`${b.bookie} logo`}
                     width={20}
                     height={20}
