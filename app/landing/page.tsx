@@ -37,6 +37,7 @@ import { MatchCarousel } from '@/components/match-carousel'
 import { get } from 'http'
 import { BetOfTheDay } from '@/components/bet-of-the-day'
 import { LandingNavbar } from '@/components/landing-navbar'
+import { KvotizzaPickSkeleton, TicketSkeleton } from '@/components/bet-of-the-day-skeleton'
 
 const blogPosts = [
   {
@@ -121,11 +122,14 @@ export default function Landing() {
   const [allMarketDeviations, setMarketDeviations] = useState<MarketDeviation[]>([]) // Store all matches from API
   const [allTopMatches, setTopMatches] = useState<TopMatches[]>([]) // Store all matches from API
   const [isDark, setIsDark] = useState(false)
+  const [loadingBetOfTheDay, setLoadingBetOfTheDay] = useState<boolean>(true)
+  const [loadingDailyTicket, setLoadingDailyTicket] = useState<boolean>(true)
 
   const [dailyTicket, setDailyTicket] = useState<DailyTicketLeg[]>([]) // Store all matches from API
   const [analysisModalOpen, setAnalysisModalOpen] = useState<boolean>(false)
   const [analysisSelections, setAnalysisSelections] = useState<BetTypeSelection[]>([])
   const [analysisStake, setAnalysisStake] = useState<number>(200)
+
   const getTodayDate = (): string => {
     const today = new Date()
     const year = today.getFullYear()
@@ -146,39 +150,45 @@ export default function Landing() {
     }
   }, [isDark])
   const fetchMarketDeviations = async () => {
-    const data = await apiService.getMarketDeviations(selectedSport)
+    try {
+      const data = await apiService.getMarketDeviations(selectedSport)
 
-    let market_deviations: MarketDeviation[] = []
-    if (Array.isArray(data)) {
-      // API returns array directly: [{match1}, {match2}, ...]
-      market_deviations = data
-    } else if (data && typeof data === 'object') {
-      // API returns object with matches array
-      market_deviations =
-        (
-          data as {
-            matches?: MarketDeviation[]
-            data?: MarketDeviation[]
-            results?: MarketDeviation[]
-          }
-        ).matches ||
-        (
-          data as {
-            matches?: MarketDeviation[]
-            data?: MarketDeviation[]
-            results?: MarketDeviation[]
-          }
-        ).data ||
-        (
-          data as {
-            matches?: MarketDeviation[]
-            data?: MarketDeviation[]
-            results?: MarketDeviation[]
-          }
-        ).results ||
-        []
+      let market_deviations: MarketDeviation[] = []
+      if (Array.isArray(data)) {
+        // API returns array directly: [{match1}, {match2}, ...]
+        market_deviations = data
+      } else if (data && typeof data === 'object') {
+        // API returns object with matches array
+        market_deviations =
+          (
+            data as {
+              matches?: MarketDeviation[]
+              data?: MarketDeviation[]
+              results?: MarketDeviation[]
+            }
+          ).matches ||
+          (
+            data as {
+              matches?: MarketDeviation[]
+              data?: MarketDeviation[]
+              results?: MarketDeviation[]
+            }
+          ).data ||
+          (
+            data as {
+              matches?: MarketDeviation[]
+              data?: MarketDeviation[]
+              results?: MarketDeviation[]
+            }
+          ).results ||
+          []
+      }
+      setMarketDeviations(market_deviations)
+    } catch (error) {
+      console.error('Error fetching market deviations:', error)
+    } finally {
+      setLoadingBetOfTheDay(false)
     }
-    setMarketDeviations(market_deviations)
   }
 
   useEffect(() => {
@@ -208,39 +218,44 @@ export default function Landing() {
   }, [getTodayDate()])
 
   const fetchDailyTicket = async () => {
-    const data = await apiService.getDailyPicks(getTodayDate())
-    console.log(data, 'This is daily ticket data')
-    let daily_ticket: DailyTicketLeg[] = []
-    if (Array.isArray(data)) {
-      // API returns array directly: [{match1}, {match2}, ...]
-      daily_ticket = data
-    } else if (data && typeof data === 'object') {
-      // API returns object with matches array
-      daily_ticket =
-        (
-          data as {
-            matches?: DailyTicketLeg[]
-            data?: DailyTicketLeg[]
-            results?: DailyTicketLeg[]
-          }
-        ).matches ||
-        (
-          data as {
-            matches?: DailyTicketLeg[]
-            data?: DailyTicketLeg[]
-            results?: DailyTicketLeg[]
-          }
-        ).data ||
-        (
-          data as {
-            matches?: DailyTicketLeg[]
-            data?: DailyTicketLeg[]
-            results?: DailyTicketLeg[]
-          }
-        ).results ||
-        []
+    try {
+      const data = await apiService.getDailyPicks(getTodayDate())
+      let daily_ticket: DailyTicketLeg[] = []
+      if (Array.isArray(data)) {
+        // API returns array directly: [{match1}, {match2}, ...]
+        daily_ticket = data
+      } else if (data && typeof data === 'object') {
+        // API returns object with matches array
+        daily_ticket =
+          (
+            data as {
+              matches?: DailyTicketLeg[]
+              data?: DailyTicketLeg[]
+              results?: DailyTicketLeg[]
+            }
+          ).matches ||
+          (
+            data as {
+              matches?: DailyTicketLeg[]
+              data?: DailyTicketLeg[]
+              results?: DailyTicketLeg[]
+            }
+          ).data ||
+          (
+            data as {
+              matches?: DailyTicketLeg[]
+              data?: DailyTicketLeg[]
+              results?: DailyTicketLeg[]
+            }
+          ).results ||
+          []
+      }
+      setDailyTicket(daily_ticket)
+    } catch (error) {
+      console.error('Error fetching daily ticket:', error)
+    } finally {
+      setLoadingDailyTicket(false)
     }
-    setDailyTicket(daily_ticket)
   }
   const fetchedRef = useRef(false)
 
@@ -344,13 +359,10 @@ export default function Landing() {
               </div>
             </div>
           </div>
-          <div className="max-w-2xl mx-auto">
-            <BetOfTheDay marketDeviation={marketDeviation} />
-          </div>
         </div>
       </section>
 
-      <section className="py-10 md:py-12 border-y dark:border-white/30">
+      <section className="py-4 md:py-3  dark:border-white/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h2 className="text-2xl font-semibold mb-4">Brzi linkovi</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
@@ -424,22 +436,24 @@ export default function Landing() {
           </div>
         </div>
       </section>
+      <section className="py-10 md:py-14">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <h2 className="text-2xl font-semibold mb-4">Kvotizza izbor dana</h2>
 
-      <section className="py-10 md:py-14 border-y dark:border-white/30">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
-          <h2 className="text-2xl font-semibold flex items-center gap-2">Top mečevi danas</h2>
-          <MatchCarousel matches={allTopMatches} />
-        </div>
-      </section>
-
-      <section className="py-10 md:py-14 ">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 ">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold flex items-center gap-2">Tiket dana</h2>
-          </div>
-          <Card>
-            <CardContent className="p-4 md:p-6 dark:bg-kvotizza-dark-bg-20 rounded border border-md bg-muted/30">
-              <DailyTicket bets={dailyBets} onAnalyze={handleAnalyzeBet} initialStake={100} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            <div className="h-full">
+              {loadingBetOfTheDay ? (
+                <KvotizzaPickSkeleton />
+              ) : (
+                <BetOfTheDay marketDeviation={marketDeviation} />
+              )}
+            </div>
+            <div className="h-full">
+              {loadingDailyTicket ? (
+                <TicketSkeleton />
+              ) : (
+                <DailyTicket bets={dailyBets} onAnalyze={handleAnalyzeBet} initialStake={100} />
+              )}
 
               <BetAnalysisModal
                 isOpen={analysisModalOpen}
@@ -447,8 +461,15 @@ export default function Landing() {
                 selections={analysisSelections}
                 stake={analysisStake}
               />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-10 md:py-14 border-y dark:border-white/30">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
+          <h2 className="text-2xl font-semibold flex items-center gap-2">Top mečevi danas</h2>
+          <MatchCarousel matches={allTopMatches} />
         </div>
       </section>
 
