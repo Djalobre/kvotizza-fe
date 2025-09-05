@@ -1256,7 +1256,7 @@ export default function Component({}: BookiesTableProps) {
                                       alt="Bookie"
                                       width={15}
                                       height={15}
-                                      className="block hidden sm:block"
+                                      className="block hidden sm:block rounded-full border border-gray-300 dark:border-white/30 shrink-0"
                                     />
                                     <div className="flex flex-col">
                                       <div className="text-xs font-bold text-kvotizza-green-600 dark:text-kvotizza-dark-theme-green-">
@@ -1292,7 +1292,7 @@ export default function Component({}: BookiesTableProps) {
                                             alt="Bookie"
                                             width={20}
                                             height={20}
-                                            className="block hidden sm:block"
+                                            className="block hidden sm:block rounded-full border border-gray-300 dark:border-white/30 shrink-0"
                                           />
                                           {quickMarket.bestBookie}
                                         </span>
