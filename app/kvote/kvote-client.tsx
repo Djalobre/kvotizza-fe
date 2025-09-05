@@ -7,6 +7,8 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+
 import { CountryFlag } from '../../components/country-flag'
 import {
   Select,
@@ -28,6 +30,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
+  DropdownMenuCheckboxItem,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -66,6 +69,7 @@ import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from '@/components/theme-toggle' // Import the new ThemeToggle component
 import { logEvent } from '../../lib/tracking'
 import { OddsPageHeader } from '@/components/odds-page-header'
+import LeagueMultiSelect from '@/components/multi-select-dropdown'
 
 type BookiesTableProps = {}
 
@@ -261,7 +265,7 @@ export default function Component({}: BookiesTableProps) {
   const [loadingDetails, setLoadingDetails] = useState<{ [key: number]: boolean }>({})
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [leagueFilter, setLeagueFilter] = useState<string>('all')
+  const [selectedLeagues, setSelectedLeagues] = useState<string[]>([]) // empty = "All"
   const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
   const [selectedCategory, setSelectedCategory] = useState<string>(
     sportsConfigService.getDefaultCategory()
@@ -324,13 +328,13 @@ export default function Component({}: BookiesTableProps) {
 
     const urlSport = searchParams.get('sport')
     const urlDateSpan = searchParams.get('dateSpan')
-    const urlLeague = searchParams.get('league')
+    const urlLeagues = searchParams.getAll('leagues')
     const urlView = searchParams.get('view') as ViewMode | null
     const urlCategory = searchParams.get('category')
 
     if (urlSport) setSelectedSport(urlSport)
     if (urlDateSpan) setSelectedDateSpan(urlDateSpan)
-    if (urlLeague) setLeagueFilter(urlLeague)
+    if (urlLeagues.length > 0) setSelectedLeagues(urlLeagues)
     if (urlView === 'time' || urlView === 'league') setViewMode(urlView)
     if (urlCategory) setSelectedCategory(urlCategory)
     // ako ništa nije u URL-u, zadržavamo postojeće default state vrednosti
@@ -360,7 +364,6 @@ export default function Component({}: BookiesTableProps) {
 
       const data = await apiService.getMatches(selectedSport, {
         dateSpan: selectedDateSpan,
-        league: leagueFilter !== 'all' ? leagueFilter : undefined,
       })
       // Handle different API response formats
       let matches: BasicMatch[] = []
@@ -458,7 +461,7 @@ export default function Component({}: BookiesTableProps) {
   const filteredData: BasicMatch[] = allMatches.filter((match: BasicMatch) => {
     const matchesSearch: boolean =
       !searchTerm || match.matchup.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesLeague: boolean = leagueFilter === 'all' || match.league === leagueFilter
+    const matchesLeague = selectedLeagues.length === 0 || selectedLeagues.includes(match.league)
     const notStarted: boolean = !match.start_time || new Date(match.start_time) > new Date()
     return matchesSearch && matchesLeague && notStarted
   })
@@ -578,23 +581,41 @@ export default function Component({}: BookiesTableProps) {
     setExpandedRows([]) // Close expanded rows when changing view mode
   }
 
-  // Clear all filters function
   const clearAllFilters = () => {
     setSearchTerm('')
-    setLeagueFilter('all')
+    clearAllLeagues() // clears state + URL
     setSelectedDateSpan(sportsConfigService.getDefaultDateSpan())
     setCurrentPage(1)
     setParams({
-      league: null,
       dateSpan: sportsConfigService.getDefaultDateSpan(),
-      // po želji resetuj i sport/category/view:
-      // sport: selectedSport,
-      // category: null,
-      // view: viewMode,
     })
   }
+
+  const setLeaguesInUrl = (leagues: string[]) => {
+    const params = new URLSearchParams(searchParams?.toString() || '')
+    params.delete('leagues') // remove any existing
+    leagues.forEach((l) => params.append('leagues', l))
+    // Optional: if none selected, you can omit the param entirely
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
+
+  const toggleLeague = (league: string) => {
+    setSelectedLeagues((prev) => {
+      const exists = prev.includes(league)
+      const next = exists ? prev.filter((l) => l !== league) : [...prev, league]
+      setLeaguesInUrl(next)
+      setCurrentPage(1)
+      return next
+    })
+  }
+
+  const clearAllLeagues = () => {
+    setSelectedLeagues([])
+    setLeaguesInUrl([])
+    setCurrentPage(1)
+  }
   // Check if any filters are active
-  const hasActiveFilters = searchTerm !== '' || leagueFilter !== 'all'
+  const hasActiveFilters = searchTerm !== '' || selectedLeagues.length > 0
 
   if (loadingMatches) {
     return (
@@ -747,20 +768,12 @@ export default function Component({}: BookiesTableProps) {
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                         className="h-7 dark:placeholder:text-white text-xs flex-1 min-w-0 dark:bg-kvotizza-dark-bg-20"
                       />
-                      <Select value={leagueFilter} onValueChange={handleLeagueFilterUrl}>
-                        <SelectTrigger className="h-7 w-24 text-xs dark:bg-kvotizza-dark-bg-20">
-                          <Filter className="h-3 w-3 mr-1" />
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All</SelectItem>
-                          {leagues.map((league: string) => (
-                            <SelectItem key={league} value={league} className="text-xs">
-                              {league}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <LeagueMultiSelect
+                        leagues={leagues}
+                        selected={selectedLeagues}
+                        onToggle={toggleLeague}
+                        onClear={clearAllLeagues}
+                      />
                     </div>
                   </div>
 
@@ -886,23 +899,13 @@ export default function Component({}: BookiesTableProps) {
                           onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                           className="h-6 fold:h-5 text-xs fold:text-[0.6rem] flex-1"
                         />
-                        <Select value={leagueFilter} onValueChange={handleLeagueFilterUrl}>
-                          <SelectTrigger className="h-6 fold:h-5 w-20 fold:w-16 text-xs fold:text-[0.6rem]">
-                            <Filter className="h-3 fold:h-2 w-3 fold:w-2" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            {leagues.map((league: string) => (
-                              <SelectItem
-                                key={league}
-                                value={league}
-                                className="text-xs fold:text-[0.6rem]"
-                              >
-                                {league}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <LeagueMultiSelect
+                          leagues={leagues}
+                          selected={selectedLeagues}
+                          onToggle={toggleLeague}
+                          onClear={clearAllLeagues}
+                          compact
+                        />
                         {hasActiveFilters && (
                           <Button
                             variant="outline"
@@ -1036,24 +1039,10 @@ export default function Component({}: BookiesTableProps) {
               <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No matches found</h3>
               <p className="text-muted-foreground mb-4">
-                {searchTerm || leagueFilter !== 'all'
+                {searchTerm || selectedLeagues.length > 0
                   ? 'Try adjusting your search or filter criteria'
                   : `No ${currentSportConfig?.displayName || selectedSport} matches available`}
               </p>
-              {(searchTerm || leagueFilter !== 'all') && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchTerm('')
-                    setLeagueFilter('all')
-                    setSelectedDateSpan(sportsConfigService.getDefaultDateSpan())
-                    setCurrentPage(1)
-                  }}
-                  className="bg-transparent text-kvotizza-blue-700 hover:bg-kvotizza-blue-50"
-                >
-                  Clear All Filters
-                </Button>
-              )}
             </div>
           ) : (
             <Card>
@@ -1569,7 +1558,7 @@ export default function Component({}: BookiesTableProps) {
           <div className="text-center text-sm text-muted-foreground">
             Prikazuje {Math.min(startIndex + 1, totalFilteredMatches)} do{' '}
             {Math.min(endIndex, totalFilteredMatches)} od {totalFilteredMatches} mečeva
-            {(searchTerm || leagueFilter !== 'all') && (
+            {(searchTerm || selectedLeagues.length > 0) && (
               <span className="ml-2 text-kvotizza-blue-600">
                 (filtered from {allMatches.length} total)
               </span>
@@ -1595,4 +1584,7 @@ export default function Component({}: BookiesTableProps) {
       />
     </div>
   )
+}
+function setLeagueFilter(arg0: string) {
+  throw new Error('Function not implemented.')
 }
