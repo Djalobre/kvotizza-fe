@@ -42,7 +42,7 @@ export const BOOKIE_CONFIGS: Record<string, BookieUrlConfig> = {
   },
   Volcano: {
     name: 'Volcano',
-    baseUrl: 'https://www.volcano.rs',
+    baseUrl: 'https://www.volcanobet.rs',
     affiliateId: 'kvotizza789',
     trackingParams: {
       source: 'kvotizza',
