@@ -637,9 +637,6 @@ export default function Component({}: BookiesTableProps) {
       >
         <OddsPageHeader ticketCount={1} onBackToHome={() => navigateToHome()} />
         <div className="w-full sm:max-w-7xl sm:mx-auto space-y-4 shrink-0">
-          {/* Compact Header */}
-
-          {/* Compact Controls Bar */}
           {/* Mobile Controls System */}
           <div className="sticky top-[60px] fold:top-[50px] z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  rounded-lg ">
             <Card className="border-0 shadow-sm rounded-lg  ">
@@ -739,37 +736,35 @@ export default function Component({}: BookiesTableProps) {
                         ))}
                       </div>
                     </div>
+                    <div className="flex pl-4 items-center gap-2 flex-1 min-w-0 dark:text-white">
+                      {/* <Search className="h-3 w-3 text-muted-foreground" /> */}
+                      <Input
+                        placeholder="Pretraga mečeva..."
+                        value={searchTerm}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setSearchTerm(e.target.value)
+                        }
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                        className="h-7 dark:placeholder:text-white text-xs flex-1 min-w-0 dark:bg-kvotizza-dark-bg-20"
+                      />
+                      <Select value={leagueFilter} onValueChange={handleLeagueFilterUrl}>
+                        <SelectTrigger className="h-7 w-24 text-xs dark:bg-kvotizza-dark-bg-20">
+                          <Filter className="h-3 w-3 mr-1" />
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          {leagues.map((league: string) => (
+                            <SelectItem key={league} value={league} className="text-xs">
+                              {league}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   {/* Second Row: Search and Filters */}
-                  <div className="flex pl-4 items-center gap-2 flex-1 min-w-0 dark:text-white">
-                    {/* <Search className="h-3 w-3 text-muted-foreground" /> */}
-                    <Input
-                      placeholder="Pretraga mečeva..."
-                      value={searchTerm}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setSearchTerm(e.target.value)
-                      }
-                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                      className="h-7 dark:placeholder:text-white text-xs flex-1 min-w-0 dark:bg-kvotizza-dark-bg-20"
-                    />
-                    <Select value={leagueFilter} onValueChange={handleLeagueFilterUrl}>
-                      <SelectTrigger className="h-7 w-24 text-xs dark:bg-kvotizza-dark-bg-20">
-                        <Filter className="h-3 w-3 mr-1" />
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
-                        {leagues.map((league: string) => (
-                          <SelectItem key={league} value={league} className="text-xs">
-                            {league}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <ThemeToggle />
-                  </div>
                 </div>
 
                 {/* Mobile Controls - Expandable System */}
@@ -1233,7 +1228,7 @@ export default function Component({}: BookiesTableProps) {
                         return (
                           <React.Fragment key={match.id}>
                             {showGroupHeader && (
-                              <TableRow className="sticky top-[39px] z-10 bg-kvotizza-blue-500 dark:bg-dark-theme-kvotizza-blue-20 border-b shadow-sm bg-background ">
+                              <TableRow className="sticky top-[39px] z-10 bg-kvotizza-blue-500 dark:bg-kvotizza-dark-bg-10 border-b shadow-sm bg-background ">
                                 <TableCellExpanded
                                   colSpan={colSpan}
                                   className="font-bold text-lg bg-kvotizza-blue-500 dark:bg-kvotizza-dark-bg-30 text-white"
@@ -1245,7 +1240,8 @@ export default function Component({}: BookiesTableProps) {
                                       width={15}
                                       height={15}
                                       className="block hidden sm:block"
-                                    />                                    {groupHeaderText}
+                                    />
+                                    {groupHeaderText}
                                   </div>
                                 </TableCellExpanded>
                               </TableRow>
