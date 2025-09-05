@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Kvotizza - Pametno poređenje kvota',
   description: 'Uporedi kvote svih kladionica u Srbiji u realnom vremenu',
+  icons: {
+    icon: '/logo.png', // or .png/.svg
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
