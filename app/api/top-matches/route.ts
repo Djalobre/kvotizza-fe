@@ -29,63 +29,57 @@ type TopMatchesIn = {
 }
 
 export async function POST(request: Request) {
-  
   try {
-    const session = await getServerSession(authOptions);
-    // Only allow admins
-    if (!session || (session.user as any)?.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession(authOptions)
+
+    // ✅ normalize role before checking
+    const role = String((session as any)?.user?.role || '').toUpperCase()
+    if (!session || role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
     const payload = (await request.json()) as TopMatchesIn
 
-    // ——— Minimalna validacija ———
     if (!payload?.pick_date) {
-      return NextResponse.json({ error: "pick_date is required" }, { status: 400 })
+      return NextResponse.json({ error: 'pick_date is required' }, { status: 400 })
     }
     if (!Array.isArray(payload.matches) || payload.matches.length === 0) {
-      return NextResponse.json({ error: "matches must be a non-empty array" }, { status: 400 })
+      return NextResponse.json({ error: 'matches must be a non-empty array' }, { status: 400 })
     }
 
-    // Real API endpoint
     const apiConfig = sportsConfigService.getApiConfig()
-    const topMatchesEndpoint =
-      (apiConfig?.endpoints as any)?.top_matches ?? "/top-matches"
+    const topMatchesEndpoint = (apiConfig?.endpoints as any)?.top_matches ?? '/top-matches'
     const apiUrl = `${API_CONFIG.baseUrl}${topMatchesEndpoint}`
-    console.log(JSON.stringify({
-      pick_date: payload.pick_date,
-      sport: payload.sport,
-      created_by: payload.created_by ?? "system",
-      matches: payload.matches,
-    }))
-    // Prosledi payload ka real API-ju
+
+    // ✅ forward identity added by middleware → FastAPI will accept it
     const resp = await apiRequest(apiUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
         ...getApiHeaders(),
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'x-user-role': request.headers.get('x-user-role') || 'admin',
+        'x-user-id': request.headers.get('x-user-id') || String((session as any).user?.id || ''),
+        'x-user-email': request.headers.get('x-user-email') || String(session?.user?.email || ''),
       },
       body: JSON.stringify({
         pick_date: payload.pick_date,
         sport: payload.sport,
-        created_by: payload.created_by ?? "system",
+        created_by: payload.created_by ?? 'system',
         matches: payload.matches,
       }),
     })
 
-    // Vrati šta god backend vrati (status + body)
     const body = await resp.json().catch(() => ({}))
     return NextResponse.json(body, { status: resp.status })
   } catch (error) {
-    console.error("Error posting top matches to real API:", error)
+    console.error('Error posting top matches to real API:', error)
     return NextResponse.json(
-      {
-        error: "Failed to save top matches",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
+      { error: 'Failed to save top matches', message: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
     )
   }
 }
+
     
 
 export async function GET(request: Request) {
