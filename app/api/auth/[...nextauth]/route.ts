@@ -17,16 +17,17 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(c) {
         if (!c?.email || !c?.password) return null
-        const email = c.email.toLowerCase()
-        const user = await prisma.user.findUnique({ where: { email } })
+        const user = await prisma.user.findUnique({ where: { email: c.email.toLowerCase() } })
         if (!user) return null
         const ok = await verifyPassword(user.passwordHash, c.password)
         if (!ok) return null
-        if (!user.emailVerified) {
-          // tell the client exactly why
-          throw new Error('EmailNotVerified')
-        }
-        return { id: user.id, email: user.email, name: user.name, role: user.role }
+        if (!user.emailVerified) throw new Error('EmailNotVerified')
+        return {
+          id: String(user.id),                    // 👈 cast bigint → string
+          email: user.email,
+          name: user.username ?? null,
+          role: user.role,
+        } as any
       },
     }),
   ],
@@ -36,14 +37,14 @@ export const authOptions: NextAuthOptions = {
         token.uid = (user as any).id
         token.role = (user as any).role
       }
-      // keep a verified flag on the token
-      if (token.email) {
-        const u = await prisma.user.findUnique({
-          where: { email: String(token.email).toLowerCase() },
-          select: { emailVerified: true },
-        })
-        ;(token as any).verified = !!u?.emailVerified
-      }
+      // verified flag
+      const u = token.email
+        ? await prisma.user.findUnique({
+            where: { email: String(token.email).toLowerCase() },
+            select: { emailVerified: true },
+          })
+        : null
+      ;(token as any).verified = !!u?.emailVerified
       return token
     },
     async session({ session, token }) {
@@ -55,6 +56,5 @@ export const authOptions: NextAuthOptions = {
   },
   pages: { signIn: '/signin', error: '/signin' },
 }
-
 const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
