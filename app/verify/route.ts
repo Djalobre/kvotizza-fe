@@ -1,16 +1,13 @@
 // app/verify/route.ts
 export const runtime = 'nodejs'
-
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-
 const prisma = new PrismaClient()
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
   const token = url.searchParams.get('token') || ''
   const email = (url.searchParams.get('email') || '').toLowerCase()
-
   const base = process.env.NEXTAUTH_URL || `${url.protocol}//${url.host}`
 
   try {
@@ -19,7 +16,10 @@ export async function GET(req: Request) {
       return NextResponse.redirect(`${base}/signin?error=VerifyFailed`)
     }
 
-    await prisma.user.update({ where: { email }, data: { emailVerified: new Date() } })
+    await prisma.user.update({
+      where: { email },
+      data: { emailVerified: new Date(), isVerified: true },
+    })
     await prisma.verificationToken.delete({ where: { token } })
 
     return NextResponse.redirect(`${base}/signin?verify=ok`)
