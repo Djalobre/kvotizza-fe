@@ -19,6 +19,20 @@ export default function SignInInner() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const res = await signIn('credentials', {
+  email,
+  password,
+  redirect: false,
+  callbackUrl: '/',
+})
+
+if (res?.error === 'EmailNotVerified') {
+  setError('Potvrdite email pre prijave. Proverite inbox ili Spam.')
+} else if (res?.error) {
+  setError('Pogrešan email ili lozinka.')
+} else if (res?.ok) {
+  window.location.href = res.url || '/'
+}
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true); setError(null)
