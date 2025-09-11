@@ -1,39 +1,59 @@
 // app/api/auth/signup/route.ts
+export const runtime = 'nodejs'
+
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-import { hashPassword } from '@/lib/auth/password'
-import { signupSchema } from '@/lib/validation'
+import { PrismaClient, Role } from '@prisma/client'
+import { hashPassword } from '@/lib/auth/password'  // your bcrypt hash
+import { sendMail } from '@/lib/mailer'              // nodemailer Gmail sender
+import crypto from 'crypto'
+import { addHours } from 'date-fns'
 
 const prisma = new PrismaClient()
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
-    const parsed = signupSchema.safeParse(body)
-    if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
-    }
-    const { email, name, password } = parsed.data
-    const lower = email.toLowerCase()
+    const { email, name, password } = await req.json()
+    const lower = String(email).toLowerCase()
 
+    // unique by email
     const existing = await prisma.user.findUnique({ where: { email: lower } })
     if (existing) {
       return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
     }
 
     const passwordHash = await hashPassword(password)
-    const role = (process.env.ADMIN_EMAILS || '')
-      .split(',').map(s=>s.trim().toLowerCase()).includes(lower) ? 'ADMIN' : 'USER'
+    const role: Role = (process.env.ADMIN_EMAILS || '')
+      .split(',').map(s => s.trim().toLowerCase())
+      .includes(lower) ? 'ADMIN' : 'USER'
 
-    await prisma.user.create({ data: { email: lower, name: name || null, passwordHash, role } })
-
-    // 🔔 send verification email
-    await fetch(`${process.env.NEXTAUTH_URL}/api/auth/send-verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      // use absolute URL so it works in prod + server
-      body: JSON.stringify({ email: lower }),
+    // create user (emailVerified NULL, isVerified NULL/false)
+    await prisma.user.create({
+      data: {
+        email: lower,
+        username: name ?? null,
+        passwordHash,
+        role,
+      },
     })
+
+    // create verification token in kvotizza.verification_tokens
+    const token = crypto.randomUUID() + crypto.randomBytes(8).toString('hex')
+    await prisma.verificationToken.create({
+      data: {
+        identifier: lower,
+        token,
+        expires: addHours(new Date(), 24),
+      },
+    })
+
+    const base = process.env.NEXTAUTH_URL!
+    const url = `${base}/verify?token=${encodeURIComponent(token)}&email=${encodeURIComponent(lower)}`
+
+    await sendMail(
+      lower,
+      'Verify your Kvotizza account',
+      `<p>Kliknite da verifikujete nalog:</p><p><a href="${url}">${url}</a></p>`
+    )
 
     return NextResponse.json({ ok: true })
   } catch (e: any) {
