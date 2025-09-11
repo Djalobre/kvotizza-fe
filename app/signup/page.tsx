@@ -35,12 +35,16 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
-        <CardHeader><CardTitle>Create Account</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Kreiraj nalog</CardTitle></CardHeader>
         <CardContent>
           {sent ? (
-            <p className="text-sm text-green-600">
-              We’ve sent a verification link to <b>{email}</b>. Please check your inbox.
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-green-600">
+                Poslali smo verifikacioni link na <b>{email}</b>.
+                Proverite inbox ili Spam i kliknite na link.
+              </p>
+              <a href="/" className="text-sm underline">← Nazad na početnu</a>
+            </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-3">
               <Input placeholder="Name (optional)" value={name} onChange={e=>setName(e.target.value)} />
@@ -48,9 +52,9 @@ export default function SignUpPage() {
               <Input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} required />
               {error && <p className="text-sm text-red-600">{error}</p>}
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? 'Creating…' : 'Create account'}
+                {loading ? 'Nalog se kreira…' : 'Kreiraj nalog'}
               </Button>
-              <a href="/signin" className="block text-center text-sm underline mt-2">Have an account? Sign in</a>
+              <a href="/signin" className="block text-center text-sm underline mt-2">Već imaš nalog? Uloguj se</a>
             </form>
           )}
         </CardContent>
