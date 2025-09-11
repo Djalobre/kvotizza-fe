@@ -6,6 +6,7 @@ import { addHours } from 'date-fns'
 import { sendMail } from '@/lib/mailer'
 
 const prisma = new PrismaClient()
+export const runtime = 'nodejs'
 
 export async function POST(req: Request) {
   const { email } = await req.json()
