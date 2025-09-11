@@ -7,6 +7,8 @@ import { sendMail } from '@/lib/mailer'
 
 const prisma = new PrismaClient()
 
+export const runtime = 'nodejs'
+
 export async function POST(req: Request) {
   const { email } = await req.json()
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
