@@ -5,6 +5,7 @@ import { hashPassword } from '@/lib/auth/password'
 import { passwordSchema } from '@/lib/validation'
 
 const prisma = new PrismaClient()
+export const runtime = 'nodejs'
 
 export async function POST(req: Request) {
   const { token, password } = await req.json()
