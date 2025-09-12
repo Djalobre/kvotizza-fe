@@ -117,7 +117,14 @@
       "top_matches": "/top-matches",
       "daily_picks_candidates": "/admin/daily-picks/candidates",
       "daily_picks_filters": "/admin/daily-picks/filters",
-      "daily_picks_save": "/admin/daily-picks"
+      "daily_picks_save": "/admin/daily-picks",
+      "tipovanje_filters": "/tipovanje/filters",
+      "tipovanje_matches": "/tipovanje/matches",
+      "matchMarkets": "/tipovanje/match/{id}/markets",
+      "picks": "/picks",
+      "pick_status": "/picks/status",
+      "pick_leaderboard": "/picks/leaderboard",
+      "pick_me_stats": "/picks/me/stats"
     },
     "queryParams": {
       "sport": "sport",
