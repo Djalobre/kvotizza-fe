@@ -1,38 +1,65 @@
-// app/api/picks/summary/route.ts
-import { NextResponse } from "next/server"
-import { API_CONFIG, apiRequest } from "@/lib/api-config"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+// app/api/top-matches/route.ts
+export const runtime = 'nodejs'
 
-export async function GET() {
+import { NextResponse } from 'next/server'
+import { API_CONFIG, apiRequest, getApiHeaders } from '@/lib/api-config'
+import { sportsConfigService } from '@/lib/sports-config'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+
+export async function POST(request: Request) {
   try {
+    // 1) Require login
     const session = await getServerSession(authOptions)
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const role = String((session as any).user?.role || 'USER').toLowerCase()
+    const uid  = String((session as any).user?.id ?? '')
+    const email = String(session.user?.email ?? '')
+
+    // 2) Parse & (light) validate input
+    const payload = await request.json()
+    const required = ['match_id','bet_category','bet_name','odd','confidence']
+    for (const k of required) {
+      if (payload[k] === undefined || payload[k] === null || payload[k] === '')
+        return NextResponse.json({ error: `Missing field: ${k}` }, { status: 400 })
     }
 
-    const base = API_CONFIG.baseUrl.replace(/\/$/, "") // ensure no trailing slash
-    const url = `${base}/picks/summary`
+    // 3) Build FastAPI URL
+    const apiConfig = sportsConfigService.getApiConfig()
+    const submitPick = (apiConfig?.endpoints as any)?.picks ?? '/picks'
+    const apiUrl = `${API_CONFIG.baseUrl}${submitPick}`
 
-    const res = await apiRequest(url, {
-      method: "GET",
+    // 4) Call FastAPI and FORWARD identity headers
+    const resp = await apiRequest(apiUrl, {
+      method: 'POST',
       headers: {
-        "x-user-id": String((session.user as any).id),
-        "x-user-email": (session.user as any).email,
-        "x-user-role": (session.user as any).role || "USER",
+        ...getApiHeaders(),
+        'Content-Type': 'application/json',
+        'x-user-role': role,
+        'x-user-id': uid,
+        'x-user-email': email,
       },
-      cache: "no-store",
+      body: JSON.stringify({
+        match_id: payload.match_id,
+        bet_category: payload.bet_category,
+        bet_name: payload.bet_name,
+        bookie: payload.bookie ?? null,
+        odd: Number(payload.odd),
+        stake: payload.stake != null ? Number(payload.stake) : undefined,
+        analysis: payload.analysis ?? null,
+        confidence: Number(payload.confidence),
+      }),
     })
 
-    if (!res.ok) {
-      const t = await res.text()
-      return NextResponse.json({ error: t || "Upstream error" }, { status: res.status })
-    }
-
-    const data = await res.json()
-    return NextResponse.json(data, { status: res.status })
-  } catch (err: any) {
-    console.error("Error proxying /picks/summary:", err)
-    return NextResponse.json({ error: err?.message || "Unknown error" }, { status: 500 })
+    const body = await resp.json().catch(() => ({}))
+    return NextResponse.json(body, { status: resp.status })
+  } catch (error) {
+    console.error('Error submitting tip to real API:', error)
+    return NextResponse.json(
+      { error: 'Failed to submit tip matches', message: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
   }
 }
