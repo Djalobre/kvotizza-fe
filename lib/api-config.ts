@@ -24,8 +24,23 @@ export const API_CONFIG = {
     daily_picks_save: `https://api.kvotizza.online/api/admin/daily-picks`,
 
     daily_picks_filters: `https://api.kvotizza.online/api/admin/daily-picks/filters`,
+
+    tipovanje_filters: `https://api.kvotizza.online/api/tipovanje/filters`,
+
+    tipovanje_matches: `https://api.kvotizza.online/api/tipovanje/matches`,
+
+    picks: `https://api.kvotizza.online/api/picks`,
+
+    pick_status: `https://api.kvotizza.online/api/picks/status`,
+
+    pick_leaderboard: `https://api.kvotizza.online/api/picks/leaderboard`,
+
+    pick_me_stats: `https://api.kvotizza.online/api/picks/me/stats`,
     // Detailed match endpoint - sport passed as query parameter
     matchDetails: (matchId: number) => `https://api.kvotizza.online/api/matches/${matchId}`,
+
+    matchMarkets: (matchId: number) =>
+      `https://api.kvotizza.online/api/tipovanje/match/${matchId}/markets`,
   },
 
   // Request configuration
