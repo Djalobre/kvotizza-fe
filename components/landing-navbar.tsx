@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSession, signIn, signOut } from 'next-auth/react'
-import { Menu, X, Trophy, HelpCircle, Home, LogOut, User, Shield } from 'lucide-react'
+import { Menu, X, Trophy, HelpCircle, Home, LogOut, User, Shield, Volleyball } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from './theme-toggle'
@@ -44,7 +44,8 @@ export function LandingNavbar({ isDark = false, onThemeToggle }: LandingNavbarPr
 
   const navItems = [
     { label: 'Početna', href: '/', icon: Home },
-    { label: 'Kvote', href: '/kvote', icon: Trophy },
+    { label: 'Kvote', href: '/kvote', icon: Volleyball },
+    { label: 'Tipovanje', href: '/tipovanje', icon: Trophy },
     { label: 'Kontakt', href: '/kontakt', icon: HelpCircle },
   ]
 
@@ -105,16 +106,17 @@ export function LandingNavbar({ isDark = false, onThemeToggle }: LandingNavbarPr
               {status === 'unauthenticated' && (
                 <>
                   <Button
-                    variant="outline"
+                    // variant="outline"
                     size="sm"
                     onClick={() => signIn(undefined, { callbackUrl: '/' })}
+                    className="dark:hover:bg-white/30 dark:bg-white/10 dark:text-white bg-black/10 hover:bg-black/30 text-black font-medium"
                   >
                     Prijava
                   </Button>
                   <Link href="/signup">
                     <Button
                       size="sm"
-                      className="bg-sport-green-500 hover:bg-sport-green-600 text-black font-medium"
+                      className="text-white bg-sport-green-500 hover:bg-sport-green-500/80 font-medium"
                     >
                       Registracija
                     </Button>
