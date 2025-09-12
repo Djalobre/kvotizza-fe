@@ -17,7 +17,10 @@ export interface Bookie {
 export interface Categories {
   categories: string[]
 }
-
+export interface BookieOdd {
+  bookie: string
+  odd: number
+}
 export interface MarketDeviation {
   home_team: string
   away_team: string
@@ -31,6 +34,7 @@ export interface MarketDeviation {
   sport_name: string
   avg_odd: number
   odstupanje: number
+  allOdds: BookieOdd[]
 }
 export interface BetItem {
   key: string // e.g. "konacanIshod1"
@@ -142,6 +146,123 @@ export type DailyTicket = {
   published_by: string
   published_at: string
   notes: string | null
+}
+export function buildQS(params: Record<string, any>) {
+  const q = new URLSearchParams()
+  Object.entries(params).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === '') return
+    if (Array.isArray(v)) v.forEach((x) => q.append(k, String(x)))
+    else q.set(k, String(v))
+  })
+  return q.toString()
+}
+export interface PickStatus {
+  hasPick: boolean
+  pick: { id: number; submitted_at: string; day_belgrade?: string } | null
+}
+
+export type TipStatus = 'pending' | 'won' | 'lost' | 'void'
+export type FeedSort = 'newest' | 'popular' | 'highest-odds' | 'highest-confidence'
+
+export type LeaderboardRow = {
+  rank: number
+  user: { id: number; name: string; initials: string; verified: boolean }
+  points: number
+  stats: {
+    tips: number
+    wins: number
+    success_pct: number
+    roi_pct: number
+    avg_odds: number
+    streak_win: number
+  }
+}
+
+export type LeaderboardData = {
+  competition_id: number
+  period: { start: string; end: string }
+  rows: LeaderboardRow[]
+}
+
+export type PicksFeed = { rows: PickRow[] } | PickRow[]
+
+export type MyStatsPayload = {
+  user: { name: string; avatar: string; verified: boolean }
+  currentRank: number | null
+  totalPlayers: number | null
+  points: number
+  monthlyStats: {
+    totalTips: number
+    wonTips: number
+    lostTips: number
+    winRate: number
+    roi: number
+    avgOdds: number
+    totalStake: number
+    totalReturn: number
+    profit: number
+    currentStreak: number
+    bestStreak: number
+  }
+  recentTips: Array<{
+    match: string
+    result: 'won' | 'lost' | 'void'
+    odds: number
+    profit: number
+  }>
+  achievements: Array<{ name: string; icon: string; unlocked: boolean }>
+}
+
+export type CompetitionSummary = {
+  title: string
+  competition_id: number
+  starts_at: string
+  ends_at: string
+  days: {
+    left: number
+    total: number
+    progress_pct: number
+  }
+  participants: number
+  active_tips: number
+  total_prize_eur: number
+  prizes: { place: number; label: string }[]
+}
+
+export type PickRow = {
+  id: number
+  user_id: number
+  user_name?: string | null
+  user_verified?: boolean | null
+
+  competition_id: number
+  match_id: number
+
+  // MATCH META: now comes from feed directly (snapshot)
+  home_team: string
+  away_team: string
+  competition_name: string
+  sport_name: string
+  start_time: string // ISO
+
+  // pick details
+  bet_category: string
+  bet_name: string
+  bookie?: string | null
+  odd: number
+  stake?: number | null
+  confidence?: number | null
+  analysis?: string | null
+  status: 'pending' | 'won' | 'lost' | 'void'
+  points?: number | null
+  submitted_at: string // ISO
+}
+
+export type Props = {
+  period?: 'month' | 'all'
+  start?: string // 'YYYY-MM-DD' (overrides period if both start & end are present)
+  end?: string // 'YYYY-MM-DD'
+  limit?: number
 }
 
 export type DailyTicketLeg = {
