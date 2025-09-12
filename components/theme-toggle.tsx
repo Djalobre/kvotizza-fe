@@ -26,12 +26,12 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 dark:hover:bg-white/10">
           {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="dark:bg-kvotizza-dark-bg-20">
         <DropdownMenuItem onClick={() => setTheme('light')} className="flex items-center gap-2">
           <Sun className="h-4 w-4" />
           <span>Svetla tema</span>
