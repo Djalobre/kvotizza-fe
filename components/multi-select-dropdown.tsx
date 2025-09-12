@@ -49,14 +49,18 @@ function LeagueMultiSelect({
         <Button
           variant="outline"
           size="sm"
-          className={compact ? 'h-6 w-28 text-xs' : 'h-7 w-28 text-xs'}
+          className={
+            compact
+              ? 'h-6 w-28 text-xs dark:bg-kvotizza-dark-bg-20'
+              : 'h-7 w-28 text-xs dark:bg-kvotizza-dark-bg-20'
+          }
         >
           <Filter className="h-3 w-3 mr-1" />
           {label}
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-64 p-0">
+      <DropdownMenuContent className="w-64 p-0 dark:bg-kvotizza-dark-bg-10 dark:hover:bg-kvotizza-dark-bg-20">
         <DropdownMenuLabel className="px-3 py-2 text-xs">Takmičenja</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
