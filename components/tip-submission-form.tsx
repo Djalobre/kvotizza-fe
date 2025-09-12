@@ -18,7 +18,6 @@ import {
 import { Calculator, Send, Star, Clock, Trophy, CheckCircle, Loader2 } from 'lucide-react'
 import { apiService } from '@/lib/api-service'
 // Optional: only used in success preview block if you keep it
-import { bookiesData } from '@/lib/data'
 
 interface TipSubmissionFormProps {
   onTipSubmitted?: (tip: any) => void
@@ -331,7 +330,7 @@ export function TipSubmissionForm({ onTipSubmitted }: TipSubmissionFormProps) {
   if (submitSuccess) {
     return (
       <Card>
-        <CardContent className="pt-6 dark:bg-dark-kvotizza-bg-20">
+        <CardContent className="pt-6 ">
           <div className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -347,7 +346,7 @@ export function TipSubmissionForm({ onTipSubmitted }: TipSubmissionFormProps) {
                 <div>
                   <span className="font-medium">Meč:</span>
                   <p className="text-green-800">
-                    {bookiesData.find((m: any) => m.id.toString() === selectedMatch)?.matchup ||
+                    {allMatches.find((m: Match) => m.match_id.toString() === selectedMatch)?.matchup ||
                       selectedMatch}
                   </p>
                 </div>
