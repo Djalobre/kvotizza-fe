@@ -1,43 +1,48 @@
 // app/api/picks/me-stats/route.ts
-import { NextResponse } from "next/server"
-import { API_CONFIG, apiRequest } from "@/lib/api-config"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+export const runtime = 'nodejs'
+
+import { NextResponse } from 'next/server'
+import { API_CONFIG } from '@/lib/api-config'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export async function GET(req: Request) {
   try {
+    // 1) Require login
     const session = await getServerSession(authOptions)
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const uid   = String((session.user as any).id ?? '')
+    const email = String((session.user as any).email ?? '')
+    const role  = String((session.user as any).role ?? 'USER')
 
+    // 2) Params passthrough
     const { searchParams } = new URL(req.url)
-    const period = searchParams.get("period") ?? "month"
+    const period = searchParams.get('period') ?? 'month'
 
-    const path = `/picks/me/stats?period=${encodeURIComponent(period)}`
-    const url = `${API_CONFIG.baseUrl}${path}`
+    // 3) Build URL
+    const url = `${API_CONFIG.baseUrl.replace(/\/$/, '')}/picks/me/stats?period=${encodeURIComponent(period)}`
+    console.log('Proxy →', url)
 
-    console.log("Fetching me-stats from:", url)
-
-    const res = await apiRequest(url, {
-      method: "GET",
+    // 4) Call FastAPI directly (avoid wrappers that throw on !ok)
+    const res = await fetch(url, {
+      method: 'GET',
       headers: {
-        "x-user-id": String((session.user as any).id),
-        "x-user-email": (session.user as any).email,
-        "x-user-role": (session.user as any).role || "USER",
+        'x-user-id': uid,
+        'x-user-email': email,
+        'x-user-role': role,
       },
-      cache: "no-store",
+      cache: 'no-store',
     })
 
-    if (!res.ok) {
-      const t = await res.text()
-      return NextResponse.json({ error: t || "Upstream error" }, { status: res.status })
-    }
-
-    const data = await res.json()
-    return NextResponse.json(data, { status: res.status })
+    // 5) Pipe upstream status/body back
+    const text = await res.text()
+    let body: any
+    try { body = JSON.parse(text) } catch { body = text ? { error: text } : {} }
+    return NextResponse.json(body, { status: res.status })
   } catch (err: any) {
-    console.error("me-stats proxy error:", err)
-    return NextResponse.json({ error: "Failed to load stats" }, { status: 500 })
+    console.error('me-stats proxy error:', err?.stack || err?.message || err)
+    return NextResponse.json({ error: 'Proxy failed' }, { status: 500 })
   }
 }
