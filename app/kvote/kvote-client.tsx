@@ -70,6 +70,7 @@ import { ThemeToggle } from '@/components/theme-toggle' // Import the new ThemeT
 import { logEvent } from '../../lib/tracking'
 import { OddsPageHeader } from '@/components/odds-page-header'
 import LeagueMultiSelect from '@/components/multi-select-dropdown'
+import { LandingNavbar } from '@/components/landing-navbar'
 
 type BookiesTableProps = {}
 
@@ -656,8 +657,9 @@ export default function Component({}: BookiesTableProps) {
           sidebarOpen ? 'mr-96' : 'mr-0'
         } px-[5px] sm:px-4 md:px-8 relative`}
       >
-        <OddsPageHeader ticketCount={1} onBackToHome={() => navigateToHome()} />
-        <div className="w-full sm:max-w-7xl sm:mx-auto space-y-4 shrink-0">
+        <LandingNavbar />
+
+        <div className="pt-2 w-full sm:max-w-7xl sm:mx-auto space-y-4 shrink-0">
           {/* Mobile Controls System */}
           <div className="sticky top-[60px] fold:top-[50px] z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  rounded-lg ">
             <Card className="border-0 shadow-sm rounded-lg  ">
@@ -1228,7 +1230,7 @@ export default function Component({}: BookiesTableProps) {
                                       alt="Bookie"
                                       width={15}
                                       height={15}
-                                      className="block hidden sm:block"
+                                      className="block hidden sm:block rounded-full border border-gray-300 dark:border-white/30 shrink-0"
                                     />
                                     {groupHeaderText}
                                   </div>
@@ -1292,7 +1294,7 @@ export default function Component({}: BookiesTableProps) {
                                             alt="Bookie"
                                             width={20}
                                             height={20}
-                                            className="block hidden sm:block rounded-full border border-gray-300 dark:border-white/30 shrink-0"
+                                            className="block hidden sm:block"
                                           />
                                           {quickMarket.bestBookie}
                                         </span>
