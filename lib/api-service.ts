@@ -396,7 +396,7 @@ export class ApiService {
         throw new Error(`Failed to fetch match details: ${response.status} ${response.statusText}`)
       }
       const data = await response.json()
-      return Array.isArray(data) ? data : data.markets || data.data || []
+      return data;
     } catch (error) {
       console.error(`Error in getMatchDetails for match ${matchId}:`, error)
       throw error
