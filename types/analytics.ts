@@ -41,6 +41,45 @@ export interface RecommendationsResponse {
   total_pages: number;
 }
 
+export interface TeamStatMetric {
+  count: number;
+  total: number;
+  percentage: number;
+}
+
+export interface TeamStatistic {
+  team: string;
+  league: string;
+  country: string;
+  total_matches: number;
+  over_2_5_ft: TeamStatMetric;
+  btts_ft: TeamStatMetric;
+  over_1_5_fh: TeamStatMetric;
+  clean_sheets: TeamStatMetric;
+}
+
+export type GetTeamStatisticsParams = {
+  countries?: string[];
+  leagues?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+  minMatches?: number;
+  sortBy?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export interface TeamStatisticsResponse {
+  data: TeamStatistic[];
+  total_count: number;
+  total_pages: number;
+  filters: {
+    countries: string[] | null;
+    leagues: string[] | null;
+    min_matches: number;
+  };
+}
+
 export interface SummaryStats {
   fixtures: {
     total_countries: number;
