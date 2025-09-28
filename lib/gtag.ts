@@ -1,6 +1,6 @@
-// src/lib/gtag.ts
+// lib/gtag.ts
+export const GA_MEASUREMENT_ID = "G-49KMYBCQYK";
 
-// Extend the Window interface to include gtag
 declare global {
   interface Window {
     gtag: (
@@ -10,8 +10,6 @@ declare global {
     ) => void;
   }
 }
-
-export const GA_MEASUREMENT_ID = "G-49KMYBCQYK"; // replace with your GA4 ID
 
 export const pageview = (url: string) => {
   if (typeof window !== "undefined" && window.gtag) {
