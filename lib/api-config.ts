@@ -44,6 +44,8 @@ export const API_CONFIG = {
       `https://api.kvotizza.online/api/tipovanje/match/${matchId}/markets`,
     football_analysis_metrics: `https://api.kvotizza.online/api/football/analysis/metrics`,
 
+    football_analysis_team_statistics: `https://api.kvotizza.online/api/football/analysis/team-statistics`,
+
     football_analysis_countries: `https://api.kvotizza.online/api/football/analysis/countries`,
 
     football_analysis_leagues: `https://api.kvotizza.online/api/football/analysis/leagues`,

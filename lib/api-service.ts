@@ -17,9 +17,11 @@ import { sportsConfigService } from "../services/sports-config-service"; // Decl
 import { Market, Match } from "@/components/tip-submission-form";
 import {
   AnalysisMetric,
+  GetTeamStatisticsParams,
   LeagueOption,
   RecommendationsResponse,
   SummaryStats,
+  TeamStatisticsResponse,
 } from "@/types/analytics";
 import { API_CONFIG, apiRequest } from "./api-config";
 
@@ -456,6 +458,42 @@ export class ApiService {
     }
   }
 
+  // In your AnalyticsAPIService class or wherever your API methods are
+
+  async getTeamStatistics(
+    params: GetTeamStatisticsParams
+  ): Promise<TeamStatisticsResponse> {
+    try {
+      const searchParams = new URLSearchParams();
+
+      if (params.countries && params.countries.length > 0) {
+        params.countries.forEach((c) => searchParams.append("countries", c));
+      }
+      if (params.leagues && params.leagues.length > 0) {
+        params.leagues.forEach((l) => searchParams.append("leagues", l));
+      }
+      if (params.dateFrom) searchParams.append("date_from", params.dateFrom);
+      if (params.dateTo) searchParams.append("date_to", params.dateTo);
+      if (params.minMatches !== undefined)
+        searchParams.append("min_matches", String(params.minMatches));
+      if (params.sortBy) searchParams.append("sort_by", params.sortBy);
+      // Pagination - new params
+      if (params.page !== undefined)
+        searchParams.append("page", String(params.page));
+      if (params.pageSize !== undefined)
+        searchParams.append("page_size", String(params.pageSize));
+
+      const url = `${
+        API_CONFIG.endpoints.football_analysis_team_statistics
+      }?${searchParams.toString()}`;
+      const response = await apiRequest(url);
+      if (!response.ok) throw new Error("Failed to fetch team statistics");
+      return await response.json();
+    } catch (error) {
+      console.error("Error in getTeamStatistics:", error);
+      throw error;
+    }
+  }
   async getRecommendations(params: {
     analysisType: string;
     countries?: string[];
