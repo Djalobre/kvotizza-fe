@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -8,7 +9,7 @@ import { SessionProvider } from "next-auth/react";
 import Providers from "./providers";
 import Script from "next/script";
 import * as gtag from "../lib/gtag";
-import { usePathname } from "next/navigation";
+import Analytics from "./analitika/analitika"; // Dodajte ovo
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   title: "Kvotizza - Pametno poređenje kvota",
   description: "Uporedi kvote svih kladionica u Srbiji u realnom vremenu",
   icons: {
-    icon: "/logo.png", // or .png/.svg
+    icon: "/logo.png",
   },
 };
 
@@ -42,14 +43,17 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${gtag.GA_MEASUREMENT_ID}', { page_path: window.location.pathname });
+            gtag('config', '${gtag.GA_MEASUREMENT_ID}');
           `,
           }}
         />
       </head>
       <body className={inter.className}>
         <Providers>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            {children}
+            <Analytics /> {/* Dodajte Analytics komponentu */}
+          </ThemeProvider>
         </Providers>
       </body>
     </html>
