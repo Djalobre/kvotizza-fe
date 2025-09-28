@@ -7,10 +7,16 @@ import {
   FilterState,
 } from "@/components/analytics/analytics-filter";
 import { MatchupAnalytics } from "@/components/analytics/matchup-analytics";
+import GoalStatsView from "@/components/analytics/goals-stats-view";
 import { apiService } from "@/lib/api-service";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AnalysisMetric, MatchRecommendation } from "@/types/analytics";
+import {
+  AnalysisMetric,
+  MatchRecommendation,
+  TeamStatistic,
+} from "@/types/analytics";
 import { LandingNavbar } from "@/components/landing-navbar";
+import { set } from "date-fns";
 
 // Helper function to get local date string in YYYY-MM-DD format
 function getLocalDateString(date: Date): string {
@@ -36,9 +42,11 @@ export default function AnalyticsPage() {
   const [recommendations, setRecommendations] = useState<MatchRecommendation[]>(
     []
   );
+  const [teamStats, setTeamStats] = useState<TeamStatistic[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingTeamStats, setLoadingTeamStats] = useState(false);
 
   const handleThemeToggle = () => {
     setIsDark(!isDark);
@@ -51,6 +59,7 @@ export default function AnalyticsPage() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDark]);
+
   useEffect(() => {
     apiService
       .getMetrics()
@@ -63,12 +72,9 @@ export default function AnalyticsPage() {
       .catch(console.error);
   }, []);
 
-  useEffect(() => {
-    setLoading(true);
-
-    // Get current date in LOCAL timezone
+  // Calculate date range helper
+  const getDateRange = useCallback(() => {
     const today = new Date();
-
     let dateFrom: string | undefined;
     let dateTo: string | undefined;
 
@@ -95,11 +101,13 @@ export default function AnalyticsPage() {
         break;
     }
 
-    console.log("Date filter:", {
-      dateFrom,
-      dateTo,
-      currentTime: new Date().toString(),
-    });
+    return { dateFrom, dateTo };
+  }, [filters.dateRange]);
+
+  // Load match recommendations
+  useEffect(() => {
+    setLoading(true);
+    const { dateFrom, dateTo } = getDateRange();
 
     apiService
       .getRecommendations({
@@ -120,7 +128,32 @@ export default function AnalyticsPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [selectedMetric, filters, sortBy, currentPage, pageSize]);
+  }, [selectedMetric, filters, sortBy, currentPage, pageSize, getDateRange]);
+
+  // Load team statistics
+  useEffect(() => {
+    setLoadingTeamStats(true);
+    const { dateFrom, dateTo } = getDateRange();
+
+    apiService
+      .getTeamStatistics({
+        countries: filters.countries.length > 0 ? filters.countries : undefined,
+        leagues: filters.leagues.length > 0 ? filters.leagues : undefined,
+        dateFrom,
+        dateTo,
+        minMatches: 5,
+        sortBy: "over_2_5_ft",
+        page: currentPage,
+        pageSize: pageSize,
+      })
+      .then((data) => {
+        setTeamStats(data.data);
+        setTotalCount(data.total_count);
+        setTotalPages(data.total_pages);
+      })
+      .catch(console.error)
+      .finally(() => setLoadingTeamStats(false));
+  }, [filters, getDateRange, currentPage, pageSize]);
 
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
@@ -132,12 +165,17 @@ export default function AnalyticsPage() {
       <LandingNavbar isDark={isDark} onThemeToggle={handleThemeToggle} />
 
       <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Analitika</h1>
+          <p className="text-muted-foreground">
+            Detaljne statistike i analize za informisano klađenje
+          </p>
+        </div>
+
         <Tabs defaultValue="mecevi" className="w-full">
           <TabsList>
             <TabsTrigger value="mecevi">Mečevi</TabsTrigger>
-            <TabsTrigger value="golovi" disabled>
-              Golovi
-            </TabsTrigger>
+            <TabsTrigger value="golovi">Golovi</TabsTrigger>
             <TabsTrigger value="forma" disabled>
               Forma
             </TabsTrigger>
@@ -180,7 +218,44 @@ export default function AnalyticsPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="golovi">
+          <TabsContent value="golovi" className="space-y-6 mt-6">
+            <AnalyticsFilter onFilterChange={handleFilterChange} />
+
+            {loadingTeamStats ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-24" />
+                  ))}
+                </div>
+                <Skeleton className="h-96 w-full" />
+              </div>
+            ) : (
+              <GoalStatsView
+                data={teamStats}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={totalCount}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+                onPageSizeChange={setPageSize}
+              />
+            )}
+          </TabsContent>
+
+          <TabsContent value="forma">
+            <div className="text-center py-12 text-muted-foreground">
+              Uskoro dostupno
+            </div>
+          </TabsContent>
+
+          <TabsContent value="timovi">
+            <div className="text-center py-12 text-muted-foreground">
+              Uskoro dostupno
+            </div>
+          </TabsContent>
+
+          <TabsContent value="lige">
             <div className="text-center py-12 text-muted-foreground">
               Uskoro dostupno
             </div>
