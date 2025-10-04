@@ -16,7 +16,6 @@ import {
   TeamStatistic,
 } from "@/types/analytics";
 import { LandingNavbar } from "@/components/landing-navbar";
-import { set } from "date-fns";
 
 // Helper function to get local date string in YYYY-MM-DD format
 function getLocalDateString(date: Date): string {
@@ -33,6 +32,7 @@ export default function AnalyticsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [isDark, setIsDark] = useState(false);
+  const [activeTab, setActiveTab] = useState("mecevi");
 
   const [filters, setFilters] = useState<FilterState>({
     countries: [],
@@ -43,8 +43,13 @@ export default function AnalyticsPage() {
     []
   );
   const [teamStats, setTeamStats] = useState<TeamStatistic[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+
+  // Separate pagination state for each tab
+  const [matchesTotalCount, setMatchesTotalCount] = useState(0);
+  const [matchesTotalPages, setMatchesTotalPages] = useState(0);
+  const [goalsTotalCount, setGoalsTotalCount] = useState(0);
+  const [goalsTotalPages, setGoalsTotalPages] = useState(0);
+
   const [loading, setLoading] = useState(true);
   const [loadingTeamStats, setLoadingTeamStats] = useState(false);
 
@@ -104,8 +109,10 @@ export default function AnalyticsPage() {
     return { dateFrom, dateTo };
   }, [filters.dateRange]);
 
-  // Load match recommendations
+  // Load match recommendations - only when on mecevi tab
   useEffect(() => {
+    if (activeTab !== "mecevi") return;
+
     setLoading(true);
     const { dateFrom, dateTo } = getDateRange();
 
@@ -123,15 +130,25 @@ export default function AnalyticsPage() {
       })
       .then((data) => {
         setRecommendations(data.data);
-        setTotalCount(data.total_count);
-        setTotalPages(data.total_pages);
+        setMatchesTotalCount(data.total_count);
+        setMatchesTotalPages(data.total_pages);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [selectedMetric, filters, sortBy, currentPage, pageSize, getDateRange]);
+  }, [
+    activeTab,
+    selectedMetric,
+    filters,
+    sortBy,
+    currentPage,
+    pageSize,
+    getDateRange,
+  ]);
 
-  // Load team statistics
+  // Load team statistics - only when on golovi tab
   useEffect(() => {
+    if (activeTab !== "golovi") return;
+
     setLoadingTeamStats(true);
     const { dateFrom, dateTo } = getDateRange();
 
@@ -148,12 +165,12 @@ export default function AnalyticsPage() {
       })
       .then((data) => {
         setTeamStats(data.data);
-        setTotalCount(data.total_count);
-        setTotalPages(data.total_pages);
+        setGoalsTotalCount(data.total_count);
+        setGoalsTotalPages(data.total_pages);
       })
       .catch(console.error)
       .finally(() => setLoadingTeamStats(false));
-  }, [filters, getDateRange, currentPage, pageSize]);
+  }, [activeTab, filters, getDateRange, currentPage, pageSize]);
 
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
@@ -172,7 +189,11 @@ export default function AnalyticsPage() {
           </p>
         </div>
 
-        <Tabs defaultValue="mecevi" className="w-full">
+        <Tabs
+          defaultValue="mecevi"
+          className="w-full"
+          onValueChange={setActiveTab}
+        >
           <TabsList>
             <TabsTrigger value="mecevi">Mečevi</TabsTrigger>
             <TabsTrigger value="golovi">Golovi</TabsTrigger>
@@ -207,8 +228,8 @@ export default function AnalyticsPage() {
                 selectedMetric={selectedMetric}
                 sortBy={sortBy}
                 currentPage={currentPage}
-                totalPages={totalPages}
-                totalCount={totalCount}
+                totalPages={matchesTotalPages}
+                totalCount={matchesTotalCount}
                 pageSize={pageSize}
                 onMetricChange={setSelectedMetric}
                 onSortChange={setSortBy}
@@ -234,8 +255,8 @@ export default function AnalyticsPage() {
               <GoalStatsView
                 data={teamStats}
                 currentPage={currentPage}
-                totalPages={totalPages}
-                totalCount={totalCount}
+                totalPages={goalsTotalPages}
+                totalCount={goalsTotalCount}
                 pageSize={pageSize}
                 onPageChange={setCurrentPage}
                 onPageSizeChange={setPageSize}
