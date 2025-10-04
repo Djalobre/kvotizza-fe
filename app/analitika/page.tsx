@@ -13,9 +13,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   AnalysisMetric,
   MatchRecommendation,
+  TeamFormStatistic,
   TeamStatistic,
 } from "@/types/analytics";
 import { LandingNavbar } from "@/components/landing-navbar";
+import { TeamFormAnalysis } from "@/components/analytics/team-form-analysis";
 
 // Helper function to get local date string in YYYY-MM-DD format
 function getLocalDateString(date: Date): string {
@@ -53,30 +55,12 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingTeamStats, setLoadingTeamStats] = useState(false);
 
-  const handleThemeToggle = () => {
-    setIsDark(!isDark);
-  };
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
-
-  useEffect(() => {
-    apiService
-      .getMetrics()
-      .then((data) => {
-        setMetrics(data);
-        if (data.length > 0) {
-          setSelectedMetric(data[0].value);
-        }
-      })
-      .catch(console.error);
-  }, []);
-
+  const [teamForm, setTeamForm] = useState<TeamFormStatistic[]>([]);
+  const [formTotalCount, setFormTotalCount] = useState(0);
+  const [formTotalPages, setFormTotalPages] = useState(0);
+  const [loadingTeamForm, setLoadingTeamForm] = useState(false);
+  const [selectedCriterion, setSelectedCriterion] = useState("over_2.5_ft");
+  const [lastNMatches, setLastNMatches] = useState(5);
   // Calculate date range helper
   const getDateRange = useCallback(() => {
     const today = new Date();
@@ -108,6 +92,71 @@ export default function AnalyticsPage() {
 
     return { dateFrom, dateTo };
   }, [filters.dateRange]);
+
+  // In page.tsx, add this to your useEffect:
+  useEffect(() => {
+    if (activeTab !== "forma") return;
+
+    console.log("Fetching team form data...");
+    setLoadingTeamForm(true);
+    const { dateFrom, dateTo } = getDateRange();
+
+    console.log("Date range:", { dateFrom, dateTo });
+    console.log("Filters:", filters);
+
+    apiService
+      .getTeamForm({
+        criterion: selectedCriterion,
+        lastNMatches: lastNMatches,
+        countries: filters.countries.length > 0 ? filters.countries : undefined,
+        leagues: filters.leagues.length > 0 ? filters.leagues : undefined,
+        dateFrom,
+        dateTo,
+        page: currentPage,
+        pageSize: pageSize,
+      })
+      .then((data) => {
+        console.log("Team form data received:", data);
+        setTeamForm(data.data);
+        setFormTotalCount(data.total_teams);
+        setFormTotalPages(data.total_pages);
+      })
+      .catch((error) => {
+        console.error("Error fetching team form:", error);
+      })
+      .finally(() => setLoadingTeamForm(false));
+  }, [
+    activeTab,
+    selectedCriterion,
+    lastNMatches,
+    filters,
+    getDateRange,
+    currentPage,
+    pageSize,
+  ]);
+  const handleThemeToggle = () => {
+    setIsDark(!isDark);
+  };
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
+
+  useEffect(() => {
+    apiService
+      .getMetrics()
+      .then((data) => {
+        setMetrics(data);
+        if (data.length > 0) {
+          setSelectedMetric(data[0].value);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   // Load match recommendations - only when on mecevi tab
   useEffect(() => {
@@ -197,9 +246,7 @@ export default function AnalyticsPage() {
           <TabsList>
             <TabsTrigger value="mecevi">Mečevi</TabsTrigger>
             <TabsTrigger value="golovi">Golovi</TabsTrigger>
-            <TabsTrigger value="forma" disabled>
-              Forma
-            </TabsTrigger>
+            <TabsTrigger value="forma">Forma</TabsTrigger>
             <TabsTrigger value="timovi" disabled>
               Timovi
             </TabsTrigger>
@@ -264,10 +311,33 @@ export default function AnalyticsPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="forma">
-            <div className="text-center py-12 text-muted-foreground">
-              Uskoro dostupno
-            </div>
+          <TabsContent value="forma" className="space-y-6 mt-6">
+            <AnalyticsFilter onFilterChange={handleFilterChange} />
+
+            {loadingTeamForm ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-24" />
+                  ))}
+                </div>
+                <Skeleton className="h-96 w-full" />
+              </div>
+            ) : (
+              <TeamFormAnalysis
+                data={teamForm}
+                currentPage={currentPage}
+                totalPages={formTotalPages}
+                totalCount={formTotalCount}
+                pageSize={pageSize}
+                selectedCriterion={selectedCriterion}
+                lastNMatches={lastNMatches}
+                onPageChange={setCurrentPage}
+                onPageSizeChange={setPageSize}
+                onCriterionChange={setSelectedCriterion}
+                onLastNMatchesChange={setLastNMatches}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="timovi">
