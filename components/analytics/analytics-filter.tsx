@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Select,
   SelectContent,
@@ -22,6 +22,14 @@ export interface FilterState {
   dateRange: "today" | "tomorrow" | "next_3_days" | "all";
 }
 
+// Helper function to get local date string in YYYY-MM-DD format
+function getLocalDateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function AnalyticsFilter({ onFilterChange }: AnalyticsFilterProps) {
   const [countries, setCountries] = useState<string[]>([]);
   const [allLeagues, setAllLeagues] = useState<LeagueOption[]>([]);
@@ -31,18 +39,56 @@ export function AnalyticsFilter({ onFilterChange }: AnalyticsFilterProps) {
     "today" | "tomorrow" | "next_3_days" | "all"
   >("today");
 
-  useEffect(() => {
-    apiService.getCountries().then(setCountries).catch(console.error);
-  }, []);
+  // Calculate date range based on selection
+  const getDateRange = useCallback(() => {
+    const today = new Date();
+    let dateFrom: string | undefined;
+    let dateTo: string | undefined;
 
-  useEffect(() => {
-    apiService.getLeagues().then(setAllLeagues).catch(console.error);
-  }, []);
+    switch (dateRange) {
+      case "today":
+        dateFrom = getLocalDateString(today);
+        dateTo = getLocalDateString(today);
+        break;
+      case "tomorrow":
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateFrom = getLocalDateString(tomorrow);
+        dateTo = getLocalDateString(tomorrow);
+        break;
+      case "next_3_days":
+        dateFrom = getLocalDateString(today);
+        const threeDaysLater = new Date(today);
+        threeDaysLater.setDate(threeDaysLater.getDate() + 2);
+        dateTo = getLocalDateString(threeDaysLater);
+        break;
+      case "all":
+        dateFrom = undefined;
+        dateTo = undefined;
+        break;
+    }
 
+    return { dateFrom, dateTo };
+  }, [dateRange]);
+
+  // Fetch countries with date filter
   useEffect(() => {
+    const { dateFrom, dateTo } = getDateRange();
+    apiService
+      .getCountries({ dateFrom, dateTo })
+      .then(setCountries)
+      .catch(console.error);
+  }, [dateRange, getDateRange]);
+
+  // Fetch leagues based on selected countries and date range
+  useEffect(() => {
+    const { dateFrom, dateTo } = getDateRange();
+
     if (selectedCountries.length > 0) {
       Promise.all(
-        selectedCountries.map((country) => apiService.getLeagues(country))
+        selectedCountries.map((country) =>
+          apiService.getLeagues({ country, dateFrom, dateTo })
+        )
       )
         .then((results) => {
           const uniqueLeagues = results
@@ -56,11 +102,25 @@ export function AnalyticsFilter({ onFilterChange }: AnalyticsFilterProps) {
         })
         .catch(console.error);
     } else {
-      apiService.getLeagues().then(setAllLeagues).catch(console.error);
+      apiService
+        .getLeagues({ dateFrom, dateTo })
+        .then(setAllLeagues)
+        .catch(console.error);
     }
+  }, [selectedCountries, dateRange, getDateRange]);
+
+  // Clear selections and refetch when date range changes
+  useEffect(() => {
+    setSelectedCountries([]);
+    setSelectedLeagues([]);
+  }, [dateRange]);
+
+  // Clear selected leagues when countries change
+  useEffect(() => {
     setSelectedLeagues([]);
   }, [selectedCountries]);
 
+  // Notify parent of filter changes
   useEffect(() => {
     onFilterChange({
       countries: selectedCountries,
