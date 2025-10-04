@@ -632,7 +632,42 @@ export class ApiService {
       throw error;
     }
   }
+  async getTeamForm(params: {
+    criterion?: string;
+    lastNMatches?: number;
+    countries?: string[];
+    leagues?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+    minPercentage?: number;
+    page?: number;
+    pageSize?: number;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.criterion) queryParams.append("criterion", params.criterion);
+    if (params.lastNMatches)
+      queryParams.append("last_n_matches", params.lastNMatches.toString());
+    if (params.countries)
+      params.countries.forEach((c) => queryParams.append("countries", c));
+    if (params.leagues)
+      params.leagues.forEach((l) => queryParams.append("leagues", l));
+    if (params.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params.dateTo) queryParams.append("date_to", params.dateTo);
+    if (params.minPercentage)
+      queryParams.append("min_percentage", params.minPercentage.toString());
+    if (params.page) queryParams.append("page", params.page.toString());
+    if (params.pageSize)
+      queryParams.append("page_size", params.pageSize.toString());
 
+    const response = await apiRequest(
+      `${API_CONFIG.endpoints.football_analysis_team_form}?${queryParams}`
+    );
+
+    
+
+    if (!response.ok) throw new Error("Failed to fetch team form");
+    return await response.json();
+  }
   // Optional: Add methods for filtering matches by various criteria
   async getMatchesByLeague(
     league: string,
