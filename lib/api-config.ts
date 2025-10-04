@@ -55,6 +55,9 @@ export const API_CONFIG = {
     football_analysis_summary: `https://api.kvotizza.online/api/football/analysis/stats/summary`,
 
     football_analysis_refresh: `https://api.kvotizza.online/api/football/analysis/refresh-metrics`,
+
+    football_analysis_team_form: `https://api.kvotizza.online/api/football/analysis/team-form`,
+
   },
   // Request configuration
   timeout: 10000,
