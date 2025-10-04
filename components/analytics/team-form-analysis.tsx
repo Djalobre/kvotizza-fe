@@ -44,21 +44,21 @@ interface TeamFormAnalysisProps {
 }
 
 const formCriteriaOptions = [
-  { value: "over_2.5_ft", label: "Over 2.5", description: "3+ golova po meču" },
-  { value: "over_1.5_ft", label: "Over 1.5", description: "2+ golova po meču" },
-  { value: "over_3.5_ft", label: "Over 3.5", description: "4+ golova po meču" },
-  { value: "btts_ft", label: "BTTS", description: "Oba tima daju gol" },
+  { value: "over_2.5_ft", label: "UG 3+", description: "3+ golova po meču" },
+  { value: "over_1.5_ft", label: "UG 2+", description: "2+ golova po meču" },
+  { value: "over_3.5_ft", label: "UG 4+", description: "4+ golova po meču" },
+  { value: "btts_ft", label: "GG", description: "Oba tima daju gol" },
   {
     value: "over_1.5_fh",
-    label: "PP Over 1.5",
+    label: "PP 2+",
     description: "2+ gola u prvom poluvremenu",
   },
   {
     value: "over_2.5_fh",
-    label: "PP Over 2.5",
+    label: "PP 3+",
     description: "3+ gola u prvom poluvremenu",
   },
-  { value: "btts_fh", label: "PP BTTS", description: "GG u prvom poluvremenu" },
+  { value: "btts_fh", label: "IGG", description: "GG u prvom poluvremenu" },
 ];
 
 const matchRangeOptions = [
