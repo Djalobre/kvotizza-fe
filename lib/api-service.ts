@@ -427,11 +427,21 @@ export class ApiService {
     }
   }
 
-  async getCountries(): Promise<string[]> {
+
+  async getCountries(params?: {
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<string[]> {
     try {
-      const response = await apiRequest(
-        API_CONFIG.endpoints.football_analysis_countries
-      );
+      const queryParams = new URLSearchParams();
+      if (params?.dateFrom) queryParams.append("date_from", params.dateFrom);
+      if (params?.dateTo) queryParams.append("date_to", params.dateTo);
+
+      const url = `${API_CONFIG.endpoints.football_analysis_countries}${
+        queryParams.toString() ? `?${queryParams}` : ""
+      }`;
+
+      const response = await apiRequest(url);
       if (!response.ok) throw new Error("Failed to fetch countries");
       const data = await response.json();
       return data.countries || [];
@@ -441,14 +451,21 @@ export class ApiService {
     }
   }
 
-  async getLeagues(country?: string): Promise<LeagueOption[]> {
+  async getLeagues(params?: {
+    country?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<LeagueOption[]> {
     try {
-      const params = new URLSearchParams();
-      if (country) params.append("country", country);
+      const queryParams = new URLSearchParams();
+      if (params?.country) queryParams.append("country", params.country);
+      if (params?.dateFrom) queryParams.append("date_from", params.dateFrom);
+      if (params?.dateTo) queryParams.append("date_to", params.dateTo);
 
       const url = `${API_CONFIG.endpoints.football_analysis_leagues}${
-        params.toString() ? `?${params}` : ""
+        queryParams.toString() ? `?${queryParams}` : ""
       }`;
+
       const response = await apiRequest(url);
       if (!response.ok) throw new Error("Failed to fetch leagues");
       return await response.json();
