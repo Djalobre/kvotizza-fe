@@ -16,6 +16,7 @@ import {
   Shield,
   Volleyball,
   ChartNoAxesCombined,
+  ChartSpline,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -59,7 +60,7 @@ export function LandingNavbar({
   const navItems = [
     { label: "Početna", href: "/", icon: Home },
     { label: "Kvote", href: "/kvote", icon: Volleyball },
-    // { label: "Tipovanje", href: "/tipovanje", icon: Trophy },
+    { label: "Trendovi", href: "/kretanje-kvota", icon: ChartSpline },
     { label: "Analitika", href: "/analitika", icon: ChartNoAxesCombined },
     { label: "Kontakt", href: "/kontakt", icon: HelpCircle },
   ];
