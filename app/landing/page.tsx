@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import type React from 'react'
-import Image from 'next/image'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { apiService } from '../../lib/api-service'
+import type React from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { apiService } from "../../lib/api-service";
 import {
   Trophy,
   TrendingUp,
@@ -14,12 +14,12 @@ import {
   Send,
   ShieldAlert,
   ExternalLink,
-} from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import type {
   BookiesData,
   Match,
@@ -28,46 +28,51 @@ import type {
   DailyTicketLeg,
   BetTypeSelection,
   TopMatches,
-} from '../../types/bookies'
-import { sportsConfigService } from '@/lib/sports-config'
-import type { MarketDeviation } from '../../types/bookies'
-import { BetAnalysisModal } from '@/components/bet-analysis-modal'
-import { DailyTicket } from '@/components/daily-ticket'
-import { MatchCarousel } from '@/components/match-carousel'
-import { get } from 'http'
-import { BetOfTheDay } from '@/components/bet-of-the-day'
-import { LandingNavbar } from '@/components/landing-navbar'
-import { KvotizzaPickSkeleton, TicketSkeleton } from '@/components/bet-of-the-day-skeleton'
+} from "../../types/bookies";
+import { sportsConfigService } from "@/lib/sports-config";
+import type { MarketDeviation } from "../../types/bookies";
+import { BetAnalysisModal } from "@/components/bet-analysis-modal";
+import { DailyTicket } from "@/components/daily-ticket";
+import { MatchCarousel } from "@/components/match-carousel";
+import { get } from "http";
+import { BetOfTheDay } from "@/components/bet-of-the-day";
+import { LandingNavbar } from "@/components/landing-navbar";
+import {
+  KvotizzaPickSkeleton,
+  TicketSkeleton,
+} from "@/components/bet-of-the-day-skeleton";
 
 const blogPosts = [
   {
-    id: '1',
-    title: 'Najbolje kvote za večiti derbi',
-    excerpt: 'Uporedili smo sve kladionice i pronašli najbolje kvote za derbi...',
-    date: '2025-08-01',
+    id: "1",
+    title: "Najbolje kvote za večiti derbi",
+    excerpt:
+      "Uporedili smo sve kladionice i pronašli najbolje kvote za derbi...",
+    date: "2025-08-01",
   },
   {
-    id: '2',
-    title: 'Kladionice sa najvećim bonusima u Srbiji',
-    excerpt: 'Pregled licenciranih operatera sa najvećim bonusima dobrodošlice.',
-    date: '2025-07-28',
+    id: "2",
+    title: "Kladionice sa najvećim bonusima u Srbiji",
+    excerpt:
+      "Pregled licenciranih operatera sa najvećim bonusima dobrodošlice.",
+    date: "2025-07-28",
   },
   {
-    id: '3',
-    title: 'Šta je value bet i kako ga pronaći',
-    excerpt: 'Objašnjenje koncepta value beta i praktični primeri...',
-    date: '2025-07-20',
+    id: "3",
+    title: "Šta je value bet i kako ga pronaći",
+    excerpt: "Objašnjenje koncepta value beta i praktični primeri...",
+    date: "2025-07-20",
   },
-]
+];
 
 const navigateToQuickHub = (param: string) => {
   // For Next.js App Router
-  if (typeof window !== 'undefined') {
-    window.location.href = `/kvote?${param}&datespan=svi`
+  if (typeof window !== "undefined") {
+    window.location.href = `/kvote?${param}&datespan=svi`;
   }
-}
+};
 function findBestOddOfDay(data: BookiesData): BestOddResult | null {
-  let best: BestOddResult | null = null
+  let best: BestOddResult | null = null;
 
   data.forEach((match) => {
     match.bookies.forEach((bookie) => {
@@ -76,10 +81,10 @@ function findBestOddOfDay(data: BookiesData): BestOddResult | null {
           const values: number[] = match.bookies
             .map((b) => b.categories.find((c) => c.category === cat.category))
             .map((c) => c?.odds.find((x) => x.type === o.type)?.value)
-            .filter((v): v is number => typeof v === 'number')
-          if (values.length === 0) return
-          const avg = values.reduce((a, b) => a + b, 0) / values.length
-          const improvementPct = avg > 0 ? ((o.value - avg) / avg) * 100 : 0
+            .filter((v): v is number => typeof v === "number");
+          if (values.length === 0) return;
+          const avg = values.reduce((a, b) => a + b, 0) / values.length;
+          const improvementPct = avg > 0 ? ((o.value - avg) / avg) * 100 : 0;
           if (!best || o.value > best.odd) {
             best = {
               matchId: match.id,
@@ -91,203 +96,229 @@ function findBestOddOfDay(data: BookiesData): BestOddResult | null {
               odd: o.value,
               marketAvg: avg,
               improvementPct,
-            }
+            };
           }
-        })
-      })
-    })
-  })
-  return best
+        });
+      });
+    });
+  });
+  return best;
 }
 
 function best1X2ForMatch(match: Match) {
-  const outcomes = ['1', 'X', '2'] as const
+  const outcomes = ["1", "X", "2"] as const;
   return outcomes.map((t) => {
     let best = 0,
-      bestBookie: string | null = null
+      bestBookie: string | null = null;
     match.bookies.forEach((b) => {
-      const cat = b.categories.find((c) => c.category === 'Result')
-      const val = cat?.odds.find((o) => o.type === t)?.value
+      const cat = b.categories.find((c) => c.category === "Result");
+      const val = cat?.odds.find((o) => o.type === t)?.value;
       if (val && val > best) {
-        best = val
-        bestBookie = b.name
+        best = val;
+        bestBookie = b.name;
       }
-    })
-    return { type: t, odd: best || null, bookie: bestBookie }
-  })
+    });
+    return { type: t, odd: best || null, bookie: bestBookie };
+  });
 }
 
 export default function Landing() {
-  const [selectedSport, setSelectedSport] = useState<string>(sportsConfigService.getDefaultSport())
-  const [allMarketDeviations, setMarketDeviations] = useState<MarketDeviation[]>([]) // Store all matches from API
-  const [allTopMatches, setTopMatches] = useState<TopMatches[]>([]) // Store all matches from API
-  const [isDark, setIsDark] = useState(false)
-  const [loadingBetOfTheDay, setLoadingBetOfTheDay] = useState<boolean>(true)
-  const [loadingDailyTicket, setLoadingDailyTicket] = useState<boolean>(true)
+  const [selectedSport, setSelectedSport] = useState<string>(
+    sportsConfigService.getDefaultSport()
+  );
+  const [allMarketDeviations, setMarketDeviations] = useState<
+    MarketDeviation[]
+  >([]); // Store all matches from API
+  const [allTopMatches, setTopMatches] = useState<TopMatches[]>([]); // Store all matches from API
+  const [isDark, setIsDark] = useState(false);
+  const [loadingBetOfTheDay, setLoadingBetOfTheDay] = useState<boolean>(true);
+  const [loadingDailyTicket, setLoadingDailyTicket] = useState<boolean>(true);
 
-  const [dailyTicket, setDailyTicket] = useState<DailyTicketLeg[]>([]) // Store all matches from API
-  const [analysisModalOpen, setAnalysisModalOpen] = useState<boolean>(false)
-  const [analysisSelections, setAnalysisSelections] = useState<BetTypeSelection[]>([])
-  const [analysisStake, setAnalysisStake] = useState<number>(200)
+  const [dailyTicket, setDailyTicket] = useState<DailyTicketLeg[]>([]); // Store all matches from API
+  const [analysisModalOpen, setAnalysisModalOpen] = useState<boolean>(false);
+  const [analysisSelections, setAnalysisSelections] = useState<
+    BetTypeSelection[]
+  >([]);
+  const [analysisStake, setAnalysisStake] = useState<number>(200);
 
   const getTodayDate = (): string => {
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed
-    const day = String(today.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}` // Returns date in YYYY-MM-DD format
-  }
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`; // Returns date in YYYY-MM-DD format
+  };
 
   const handleThemeToggle = () => {
-    setIsDark(!isDark)
-  }
+    setIsDark(!isDark);
+  };
 
   useEffect(() => {
     if (isDark) {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.remove("dark");
     }
-  }, [isDark])
+  }, [isDark]);
   const fetchMarketDeviations = async () => {
     try {
-      const data = await apiService.getMarketDeviations(selectedSport)
+      const data = await apiService.getMarketDeviations(selectedSport);
 
-      let market_deviations: MarketDeviation[] = []
+      let market_deviations: MarketDeviation[] = [];
       if (Array.isArray(data)) {
         // API returns array directly: [{match1}, {match2}, ...]
-        market_deviations = data
-      } else if (data && typeof data === 'object') {
+        market_deviations = data;
+      } else if (data && typeof data === "object") {
         // API returns object with matches array
         market_deviations =
           (
             data as {
-              matches?: MarketDeviation[]
-              data?: MarketDeviation[]
-              results?: MarketDeviation[]
+              matches?: MarketDeviation[];
+              data?: MarketDeviation[];
+              results?: MarketDeviation[];
             }
           ).matches ||
           (
             data as {
-              matches?: MarketDeviation[]
-              data?: MarketDeviation[]
-              results?: MarketDeviation[]
+              matches?: MarketDeviation[];
+              data?: MarketDeviation[];
+              results?: MarketDeviation[];
             }
           ).data ||
           (
             data as {
-              matches?: MarketDeviation[]
-              data?: MarketDeviation[]
-              results?: MarketDeviation[]
+              matches?: MarketDeviation[];
+              data?: MarketDeviation[];
+              results?: MarketDeviation[];
             }
           ).results ||
-          []
+          [];
       }
-      setMarketDeviations(market_deviations)
+      setMarketDeviations(market_deviations);
     } catch (error) {
-      console.error('Error fetching market deviations:', error)
+      console.error("Error fetching market deviations:", error);
     } finally {
-      setLoadingBetOfTheDay(false)
+      setLoadingBetOfTheDay(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchMarketDeviations()
-  }, [selectedSport])
+    fetchMarketDeviations();
+  }, [selectedSport]);
 
   const fetchTopMatches = async () => {
-    const data = await apiService.getTopMatches(getTodayDate())
+    const data = await apiService.getTopMatches(getTodayDate());
 
-    let top_matches: TopMatches[] = []
+    let top_matches: TopMatches[] = [];
     if (Array.isArray(data)) {
       // API returns array directly: [{match1}, {match2}, ...]
-      top_matches = data
-    } else if (data && typeof data === 'object') {
+      top_matches = data;
+    } else if (data && typeof data === "object") {
       // API returns object with matches array
       top_matches =
-        (data as { matches?: TopMatches[]; data?: TopMatches[]; results?: TopMatches[] }).matches ||
-        (data as { matches?: TopMatches[]; data?: TopMatches[]; results?: TopMatches[] }).data ||
-        (data as { matches?: TopMatches[]; data?: TopMatches[]; results?: TopMatches[] }).results ||
-        []
+        (
+          data as {
+            matches?: TopMatches[];
+            data?: TopMatches[];
+            results?: TopMatches[];
+          }
+        ).matches ||
+        (
+          data as {
+            matches?: TopMatches[];
+            data?: TopMatches[];
+            results?: TopMatches[];
+          }
+        ).data ||
+        (
+          data as {
+            matches?: TopMatches[];
+            data?: TopMatches[];
+            results?: TopMatches[];
+          }
+        ).results ||
+        [];
     }
-    setTopMatches(top_matches)
-  }
+    setTopMatches(top_matches);
+  };
 
   useEffect(() => {
-    fetchTopMatches()
-  }, [getTodayDate()])
+    fetchTopMatches();
+  }, [getTodayDate()]);
 
   const fetchDailyTicket = async () => {
     try {
-      const data = await apiService.getDailyPicks(getTodayDate())
-      let daily_ticket: DailyTicketLeg[] = []
+      const data = await apiService.getDailyPicks(getTodayDate());
+      let daily_ticket: DailyTicketLeg[] = [];
       if (Array.isArray(data)) {
         // API returns array directly: [{match1}, {match2}, ...]
-        daily_ticket = data
-      } else if (data && typeof data === 'object') {
+        daily_ticket = data;
+      } else if (data && typeof data === "object") {
         // API returns object with matches array
         daily_ticket =
           (
             data as {
-              matches?: DailyTicketLeg[]
-              data?: DailyTicketLeg[]
-              results?: DailyTicketLeg[]
+              matches?: DailyTicketLeg[];
+              data?: DailyTicketLeg[];
+              results?: DailyTicketLeg[];
             }
           ).matches ||
           (
             data as {
-              matches?: DailyTicketLeg[]
-              data?: DailyTicketLeg[]
-              results?: DailyTicketLeg[]
+              matches?: DailyTicketLeg[];
+              data?: DailyTicketLeg[];
+              results?: DailyTicketLeg[];
             }
           ).data ||
           (
             data as {
-              matches?: DailyTicketLeg[]
-              data?: DailyTicketLeg[]
-              results?: DailyTicketLeg[]
+              matches?: DailyTicketLeg[];
+              data?: DailyTicketLeg[];
+              results?: DailyTicketLeg[];
             }
           ).results ||
-          []
+          [];
       }
-      setDailyTicket(daily_ticket)
+      setDailyTicket(daily_ticket);
     } catch (error) {
-      console.error('Error fetching daily ticket:', error)
+      console.error("Error fetching daily ticket:", error);
     } finally {
-      setLoadingDailyTicket(false)
+      setLoadingDailyTicket(false);
     }
-  }
-  const fetchedRef = useRef(false)
+  };
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (fetchedRef.current) return
-    fetchedRef.current = true
-    fetchDailyTicket()
-  })
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    fetchDailyTicket();
+  });
 
-  const dailyBets = dailyTicket
-  const marketDeviation = allMarketDeviations[0]
-  const topMatches = allTopMatches
+  const dailyBets = dailyTicket;
+  const marketDeviation = allMarketDeviations[0];
+  const topMatches = allTopMatches;
 
   const onCTA = useCallback(() => {
-    window.location.href = '/kvote?sport=fudbal&datespan=danas'
-  }, [])
+    window.location.href = "/kvote?sport=fudbal&datespan=danas";
+  }, []);
 
   const onOpenTickets = useCallback(() => {
-    alert('Preview: otvorili bismo affiliate linkove za svaku nogu.')
-  }, [])
+    alert("Preview: otvorili bismo affiliate linkove za svaku nogu.");
+  }, []);
 
   const onNewsletterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    alert('Hvala! (Preview) Upisali bismo vaš email.')
-    e.currentTarget.reset()
-  }
+    e.preventDefault();
+    alert("Hvala! (Preview) Upisali bismo vaš email.");
+    e.currentTarget.reset();
+  };
 
   /** Mapira jedan red u BetTypeSelection */
   function toBetTypeSelection(row: DailyTicketLeg): BetTypeSelection {
-    const matchIdNum = Number(row.match_id)
+    const matchIdNum = Number(row.match_id);
     const oddNum =
-      row.odd === undefined || row.odd === null || row.odd === '' ? undefined : Number(row.odd)
+      row.odd === undefined || row.odd === null || row.odd === ""
+        ? undefined
+        : Number(row.odd);
 
     const out: BetTypeSelection = {
       matchId: Number.isFinite(matchIdNum) ? matchIdNum : 0,
@@ -295,40 +326,47 @@ export default function Landing() {
       league: row.competition_name,
       category: row.bet_category,
       type: row.bet_name,
-    }
+    };
 
     if (oddNum !== undefined && Number.isFinite(oddNum)) {
-      out.odd = oddNum
+      out.odd = oddNum;
     }
     if (row.bookie && row.bookie.trim()) {
-      out.bookie = row.bookie.trim()
+      out.bookie = row.bookie.trim();
     }
 
-    return out
+    return out;
   }
 
   const handleAnalyzeBet = (selections: DailyTicketLeg[], stake: number) => {
-    const selections_data = selections.map((s) => toBetTypeSelection(s))
-    setAnalysisSelections(selections_data)
-    setAnalysisStake(stake)
-    setAnalysisModalOpen(true)
-  }
+    const selections_data = selections.map((s) => toBetTypeSelection(s));
+    setAnalysisSelections(selections_data);
+    setAnalysisStake(stake);
+    setAnalysisModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background dark:bg-kvotizza-dark-bg-10">
       <LandingNavbar isDark={isDark} onThemeToggle={handleThemeToggle} />
 
       <section className="border-b dark:border-white/30">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-7 md:py-6">
           {/* Hero Content */}
           <div className="space-y-6 mb-8 md:mb-12">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-center">
-              Najbolja kvota –<span className="text-sport-green-600"> uvek na dohvat ruke.</span>
+              Najbolja kvota –
+              <span className="text-sport-green-600">
+                {" "}
+                uvek na dohvat ruke.
+              </span>
             </h1>
 
             <p className="mx-auto text-lg text-muted-foreground leading-relaxed max-w-3xl text-center">
-              <span className="font-semibold text-sport-blue-500 ">Kvotizza</span> prati sve
-              kladionice u Srbiji i odmah ti pokazuje gde je najisplativije da odigraš tiket.
+              <span className="font-semibold text-sport-blue-500 ">
+                Kvotizza
+              </span>{" "}
+              prati sve kladionice u Srbiji i odmah ti pokazuje gde je
+              najisplativije da odigraš tiket.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 justify-center">
@@ -362,84 +400,8 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="py-4 md:py-3  dark:border-white/30">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="text-2xl font-semibold mb-4">Brzi linkovi</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {/* {['Fudbal', 'Engleska 1', 'Italija 1', 'Španija 1', 'Srbija 1', 'Nemačka 1'].map( */}
-            <button
-              key={'Fudbal'}
-              onClick={(e) => {
-                e.stopPropagation()
-                navigateToQuickHub('sport=fudbal')
-              }}
-            >
-              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
-                <CardContent className="p-4 text-center font-medium">Fudbal</CardContent>
-              </Card>
-            </button>
-            <button
-              key={'Engleska 1'}
-              onClick={(e) => {
-                e.stopPropagation()
-                navigateToQuickHub('sport=fudbal&league=Engleska 1')
-              }}
-            >
-              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
-                <CardContent className="p-4 text-center font-medium">Engleska 1</CardContent>
-              </Card>
-            </button>
-            <button
-              key={'Srbija 1'}
-              onClick={(e) => {
-                e.stopPropagation()
-                navigateToQuickHub('fudbal')
-              }}
-            >
-              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
-                <CardContent className="p-4 text-center font-medium">Srbija 1</CardContent>
-              </Card>
-            </button>
-            <button
-              key={'Italija 1'}
-              onClick={(e) => {
-                e.stopPropagation()
-                navigateToQuickHub('fudbal')
-              }}
-            >
-              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
-                <CardContent className="p-4 text-center font-medium">Italija 1</CardContent>
-              </Card>
-            </button>
-            <button
-              key={'Nemačka 1'}
-              onClick={(e) => {
-                e.stopPropagation()
-                navigateToQuickHub('fudbal')
-              }}
-            >
-              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
-                <CardContent className="p-4 text-center font-medium">Nemačka 1</CardContent>
-              </Card>
-            </button>
-            <button
-              key={'Španija 1'}
-              onClick={(e) => {
-                e.stopPropagation()
-                navigateToQuickHub('fudbal')
-              }}
-            >
-              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
-                <CardContent className="p-4 text-center font-medium">Španija 1</CardContent>
-              </Card>
-            </button>
-          </div>
-        </div>
-      </section>
       <section className="py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="text-2xl font-semibold mb-4">Kvotizza izbor dana</h2>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             <div className="h-full">
               {loadingBetOfTheDay ? (
@@ -452,7 +414,11 @@ export default function Landing() {
               {loadingDailyTicket ? (
                 <TicketSkeleton />
               ) : (
-                <DailyTicket bets={dailyBets} onAnalyze={handleAnalyzeBet} initialStake={100} />
+                <DailyTicket
+                  bets={dailyBets}
+                  onAnalyze={handleAnalyzeBet}
+                  initialStake={100}
+                />
               )}
 
               <BetAnalysisModal
@@ -468,11 +434,98 @@ export default function Landing() {
 
       <section className="py-10 md:py-14 border-y dark:border-white/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
-          <h2 className="text-2xl font-semibold flex items-center gap-2">Top mečevi danas</h2>
+          <h2 className="text-2xl font-semibold flex items-center gap-2">
+            Top mečevi danas
+          </h2>
           <MatchCarousel matches={allTopMatches} />
         </div>
       </section>
-
+      <section className="py-4 md:py-3  dark:border-white/30">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <h2 className="text-2xl font-semibold mb-4">Brzi linkovi</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            {/* {['Fudbal', 'Engleska 1', 'Italija 1', 'Španija 1', 'Srbija 1', 'Nemačka 1'].map( */}
+            <button
+              key={"Fudbal"}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToQuickHub("sport=fudbal");
+              }}
+            >
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
+                <CardContent className="p-4 text-center font-medium">
+                  Fudbal
+                </CardContent>
+              </Card>
+            </button>
+            <button
+              key={"Engleska 1"}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToQuickHub("sport=fudbal&league=Engleska 1");
+              }}
+            >
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
+                <CardContent className="p-4 text-center font-medium">
+                  Engleska 1
+                </CardContent>
+              </Card>
+            </button>
+            <button
+              key={"Srbija 1"}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToQuickHub("fudbal");
+              }}
+            >
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
+                <CardContent className="p-4 text-center font-medium">
+                  Srbija 1
+                </CardContent>
+              </Card>
+            </button>
+            <button
+              key={"Italija 1"}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToQuickHub("fudbal");
+              }}
+            >
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
+                <CardContent className="p-4 text-center font-medium">
+                  Italija 1
+                </CardContent>
+              </Card>
+            </button>
+            <button
+              key={"Nemačka 1"}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToQuickHub("fudbal");
+              }}
+            >
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
+                <CardContent className="p-4 text-center font-medium">
+                  Nemačka 1
+                </CardContent>
+              </Card>
+            </button>
+            <button
+              key={"Španija 1"}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToQuickHub("fudbal");
+              }}
+            >
+              <Card className="hover:shadow-md transition-shadow dark:bg-kvotizza-dark-bg-20 dark:border-white/30 dark:hover:bg-kvotizza-dark-bg-10">
+                <CardContent className="p-4 text-center font-medium">
+                  Španija 1
+                </CardContent>
+              </Card>
+            </button>
+          </div>
+        </div>
+      </section>
       {/* 
       <section className="py-10 md:py-12 border-y dark:border-white/30">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -572,5 +625,5 @@ export default function Landing() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
