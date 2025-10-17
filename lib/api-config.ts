@@ -36,6 +36,24 @@ export const API_CONFIG = {
     pick_leaderboard: `https://api.kvotizza.online/api/picks/leaderboard`,
 
     pick_me_stats: `https://api.kvotizza.online/api/picks/me/stats`,
+
+    odds_history: "https://api.kvotizza.online/api/odds/history",
+
+    odds_changes: "https://api.kvotizza.online/api/odds/changes",
+
+    odds_bookies: "https://api.kvotizza.online/api/odds/bookies",
+
+    odds_countries: "https://api.kvotizza.online/api/odds/countries",
+
+    odds_leagues: "https://api.kvotizza.online/api/odds/leagues",
+
+    odds_bet_categories: "https://api.kvotizza.online/api/odds/bet-categories",
+
+    odds_matches_with_changes:
+      "https://api.kvotizza.online/api/odds/matches-with-changes",
+
+    odds_match_history: "https://api.kvotizza.online/api/odds/history/match",
+
     // Detailed match endpoint - sport passed as query parameter
     matchDetails: (matchId: number) =>
       `https://api.kvotizza.online/api/matches/${matchId}`,
@@ -57,7 +75,6 @@ export const API_CONFIG = {
     football_analysis_refresh: `https://api.kvotizza.online/api/football/analysis/refresh-metrics`,
 
     football_analysis_team_form: `https://api.kvotizza.online/api/football/analysis/team-form`,
-
   },
   // Request configuration
   timeout: 10000,

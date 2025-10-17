@@ -21,6 +21,7 @@ import {
   LeagueOption,
   RecommendationsResponse,
   SummaryStats,
+  TeamFormResponse,
   TeamStatisticsResponse,
 } from "@/types/analytics";
 import { API_CONFIG, apiRequest } from "./api-config";
@@ -427,7 +428,6 @@ export class ApiService {
     }
   }
 
-
   async getCountries(params?: {
     dateFrom?: string;
     dateTo?: string;
@@ -449,6 +449,64 @@ export class ApiService {
       console.error("Error in getCountries:", error);
       throw error;
     }
+  }
+
+  // Dodaj metode:
+  async getMatchesWithChanges(params: {
+    countries?: string[];
+    leagues?: string[];
+    betCategories?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+    minChangePercent?: number;
+    daysBack?: number;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.countries)
+      params.countries.forEach((c) => queryParams.append("countries", c));
+    if (params.leagues)
+      params.leagues.forEach((l) => queryParams.append("leagues", l));
+    if (params.betCategories)
+      params.betCategories.forEach((b) =>
+        queryParams.append("bet_categories", b)
+      );
+    if (params.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params.dateTo) queryParams.append("date_to", params.dateTo);
+    if (params.minChangePercent)
+      queryParams.append(
+        "min_change_percent",
+        params.minChangePercent.toString()
+      );
+    if (params.daysBack)
+      queryParams.append("days_back", params.daysBack.toString());
+
+    const url = `${API_CONFIG.endpoints.odds_matches_with_changes}${
+      queryParams.toString() ? `?${queryParams}` : ""
+    }`;
+    const response = await apiRequest(url);
+    const data = await response.json();
+    return data;
+  }
+
+  async getMatchOddsHistory(params: {
+    matchId: string;
+    betCategory?: string;
+    betName?: string;
+    bookies?: string[];
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.betCategory)
+      queryParams.append("bet_category", params.betCategory);
+    if (params.betName) queryParams.append("bet_name", params.betName);
+    if (params.bookies)
+      params.bookies.forEach((b) => queryParams.append("bookies", b));
+
+    const url = `${API_CONFIG.endpoints.odds_match_history}/${params.matchId}${
+      queryParams.toString() ? `?${queryParams}` : ""
+    }`;
+    const response = await apiRequest(url);
+    const data = await response.json();
+    return data;
   }
 
   async getLeagues(params?: {
@@ -632,42 +690,7 @@ export class ApiService {
       throw error;
     }
   }
-  async getTeamForm(params: {
-    criterion?: string;
-    lastNMatches?: number;
-    countries?: string[];
-    leagues?: string[];
-    dateFrom?: string;
-    dateTo?: string;
-    minPercentage?: number;
-    page?: number;
-    pageSize?: number;
-  }): Promise<any> {
-    const queryParams = new URLSearchParams();
-    if (params.criterion) queryParams.append("criterion", params.criterion);
-    if (params.lastNMatches)
-      queryParams.append("last_n_matches", params.lastNMatches.toString());
-    if (params.countries)
-      params.countries.forEach((c) => queryParams.append("countries", c));
-    if (params.leagues)
-      params.leagues.forEach((l) => queryParams.append("leagues", l));
-    if (params.dateFrom) queryParams.append("date_from", params.dateFrom);
-    if (params.dateTo) queryParams.append("date_to", params.dateTo);
-    if (params.minPercentage)
-      queryParams.append("min_percentage", params.minPercentage.toString());
-    if (params.page) queryParams.append("page", params.page.toString());
-    if (params.pageSize)
-      queryParams.append("page_size", params.pageSize.toString());
 
-    const response = await apiRequest(
-      `${API_CONFIG.endpoints.football_analysis_team_form}?${queryParams}`
-    );
-
-    
-
-    if (!response.ok) throw new Error("Failed to fetch team form");
-    return await response.json();
-  }
   // Optional: Add methods for filtering matches by various criteria
   async getMatchesByLeague(
     league: string,
@@ -691,6 +714,174 @@ export class ApiService {
     }
   }
 
+  async getOddsHistory(params: {
+    matchId?: string;
+    countries?: string[];
+    leagues?: string[];
+    betCategories?: string[];
+    bookies?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+    // hoursBack?: number;  // Ukloni ovaj parametar
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.matchId) queryParams.append("match_id", params.matchId);
+    if (params.countries)
+      params.countries.forEach((c) => queryParams.append("countries", c));
+    if (params.leagues)
+      params.leagues.forEach((l) => queryParams.append("leagues", l));
+    if (params.betCategories)
+      params.betCategories.forEach((b) =>
+        queryParams.append("bet_categories", b)
+      );
+    if (params.bookies)
+      params.bookies.forEach((b) => queryParams.append("bookies", b));
+    if (params.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params.dateTo) queryParams.append("date_to", params.dateTo);
+    // if (params.hoursBack) queryParams.append("hours_back", params.hoursBack.toString());  // Ukloni
+
+    const url = `${API_CONFIG.endpoints.odds_history}${
+      queryParams.toString() ? `?${queryParams}` : ""
+    }`;
+    const response = await apiRequest(url);
+    const data = await response.json();
+    return data;
+  }
+
+  async getOddsChanges(params: {
+    countries?: string[];
+    leagues?: string[];
+    betCategories?: string[];
+    bookies?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+    minChangePercent?: number;
+    maxCurrentOdd?: number;
+    hoursBack?: number;
+    page?: number;
+    pageSize?: number;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.countries)
+      params.countries.forEach((c) => queryParams.append("countries", c));
+    if (params.leagues)
+      params.leagues.forEach((l) => queryParams.append("leagues", l));
+    if (params.betCategories)
+      params.betCategories.forEach((b) =>
+        queryParams.append("bet_categories", b)
+      );
+    if (params.bookies)
+      params.bookies.forEach((b) => queryParams.append("bookies", b));
+    if (params.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params.dateTo) queryParams.append("date_to", params.dateTo);
+    if (params.minChangePercent)
+      queryParams.append(
+        "min_change_percent",
+        params.minChangePercent.toString()
+      );
+    if (params.maxCurrentOdd)
+      // NEW PARAMETER HANDLING
+      queryParams.append("max_current_odd", params.maxCurrentOdd.toString());
+    if (params.hoursBack)
+      queryParams.append("hours_back", params.hoursBack.toString());
+    if (params.page) queryParams.append("page", params.page.toString());
+    if (params.pageSize)
+      queryParams.append("page_size", params.pageSize.toString());
+
+    const response = await apiRequest(
+      `${API_CONFIG.endpoints.odds_changes}?${queryParams}`
+    );
+
+    return response.json();
+  }
+
+  async getOddsCountries(params?: {
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<string[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params?.dateTo) queryParams.append("date_to", params.dateTo);
+
+    const url = `${API_CONFIG.endpoints.odds_countries}${
+      queryParams.toString() ? `?${queryParams}` : ""
+    }`;
+    const response = await apiRequest(url);
+    const data = await response.json();
+    return data.countries;
+  }
+
+  async getOddsLeagues(params?: {
+    countries?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<any> {
+    // Changed from Promise<any[]> to Promise<any>
+    const queryParams = new URLSearchParams();
+
+    if (params?.countries && params.countries.length > 0) {
+      params.countries.forEach((country) => {
+        queryParams.append("countries", country);
+      });
+    }
+
+    if (params?.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params?.dateTo) queryParams.append("date_to", params.dateTo);
+
+    const url = `${API_CONFIG.endpoints.odds_leagues}${
+      queryParams.toString() ? `?${queryParams}` : ""
+    }`;
+    const response = await apiRequest(url);
+    return response.json();
+  }
+  async getOddsBetCategories(params?: {
+    countries?: string[];
+    leagues?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<string[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.countries)
+      params.countries.forEach((c) => queryParams.append("countries", c));
+    if (params?.leagues)
+      params.leagues.forEach((l) => queryParams.append("leagues", l));
+    if (params?.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params?.dateTo) queryParams.append("date_to", params.dateTo);
+
+    const url = `${API_CONFIG.endpoints.odds_bet_categories}${
+      queryParams.toString() ? `?${queryParams}` : ""
+    }`;
+    const response = await apiRequest(url);
+    const data = await response.json();
+    return data.bet_categories;
+  }
+
+  async getOddsBookies(params?: {
+    countries?: string[];
+    leagues?: string[];
+    betCategories?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<string[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.countries)
+      params.countries.forEach((c) => queryParams.append("countries", c));
+    if (params?.leagues)
+      params.leagues.forEach((l) => queryParams.append("leagues", l));
+    if (params?.betCategories)
+      params.betCategories.forEach((b) =>
+        queryParams.append("bet_categories", b)
+      );
+    if (params?.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params?.dateTo) queryParams.append("date_to", params.dateTo);
+
+    const url = `${API_CONFIG.endpoints.odds_bookies}${
+      queryParams.toString() ? `?${queryParams}` : ""
+    }`;
+    const response = await apiRequest(url);
+    const data = await response.json();
+    return data.bookies;
+  }
   async searchMatches(
     query: string,
     sport?: string,
@@ -782,6 +973,40 @@ export class ApiService {
     }
   }
 
+  async getTeamForm(params: {
+    criterion?: string;
+    lastNMatches?: number;
+    countries?: string[];
+    leagues?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+    minPercentage?: number;
+    page?: number;
+    pageSize?: number;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.criterion) queryParams.append("criterion", params.criterion);
+    if (params.lastNMatches)
+      queryParams.append("last_n_matches", params.lastNMatches.toString());
+    if (params.countries)
+      params.countries.forEach((c) => queryParams.append("countries", c));
+    if (params.leagues)
+      params.leagues.forEach((l) => queryParams.append("leagues", l));
+    if (params.dateFrom) queryParams.append("date_from", params.dateFrom);
+    if (params.dateTo) queryParams.append("date_to", params.dateTo);
+    if (params.minPercentage)
+      queryParams.append("min_percentage", params.minPercentage.toString());
+    if (params.page) queryParams.append("page", params.page.toString());
+    if (params.pageSize)
+      queryParams.append("page_size", params.pageSize.toString());
+
+    const response = await apiRequest(
+      `${API_CONFIG.endpoints.football_analysis_team_form}?${queryParams}`
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch team form");
+    return await response.json();
+  }
   async getMyPickStatus(
     day: string | Date,
     signal?: AbortSignal
